@@ -1,0 +1,92 @@
+/**
+ * Mock dữ liệu lịch slot phản biện và cấu hình số lượng slot cho reviewer.
+ */
+import { type ReviewerSlotConfig, type Slot } from '@/types'
+
+export const mockSlots: Slot[] = [
+  {
+    slot_id: 1,
+    round_id: 1,
+    start_time: '2024-10-10T08:00:00',
+    end_time: '2024-10-10T09:30:00',
+    room: 'B4-101',
+    max_groups: 3,
+    current_group_count: 1,
+    min_reviewers: 1,
+    max_reviewers: 3,
+    status: 'OPEN',
+    created_by: 8,
+  },
+  {
+    slot_id: 2,
+    round_id: 1,
+    start_time: '2024-10-10T09:30:00',
+    end_time: '2024-10-10T11:00:00',
+    room: 'B4-102',
+    max_groups: 3,
+    current_group_count: 3,
+    min_reviewers: 1,
+    max_reviewers: 3,
+    status: 'FULL',
+    created_by: 8,
+  },
+  {
+    slot_id: 3,
+    round_id: 1,
+    start_time: '2024-10-10T13:00:00',
+    end_time: '2024-10-10T14:30:00',
+    room: 'B4-103',
+    max_groups: 3,
+    current_group_count: 0,
+    min_reviewers: 1,
+    max_reviewers: 3,
+    status: 'OPEN',
+    created_by: 8,
+  },
+  {
+    slot_id: 4,
+    round_id: 1,
+    start_time: '2024-10-11T08:00:00',
+    end_time: '2024-10-11T09:30:00',
+    room: 'https://meet.google.com/abc-def-ghi',
+    max_groups: 3,
+    current_group_count: 2,
+    min_reviewers: 1,
+    max_reviewers: 3,
+    status: 'OPEN',
+    created_by: 8,
+  },
+  {
+    slot_id: 5,
+    round_id: 1,
+    start_time: '2024-10-11T09:30:00',
+    end_time: '2024-10-11T11:00:00',
+    room: 'B4-201',
+    max_groups: 3,
+    current_group_count: 0,
+    min_reviewers: 1,
+    max_reviewers: 3,
+    status: 'OPEN',
+    created_by: 8,
+  },
+  {
+    slot_id: 6,
+    round_id: 1,
+    start_time: '2024-10-12T08:00:00',
+    end_time: '2024-10-12T09:30:00',
+    room: 'B4-202',
+    max_groups: 3,
+    current_group_count: 1,
+    min_reviewers: 1,
+    max_reviewers: 3,
+    status: 'LOCKED',
+    created_by: 8,
+  },
+]
+
+export const mockReviewerSlotConfig: ReviewerSlotConfig[] = [
+  { config_id: 1, round_id: 1, min_slots: 2, max_slots: 4, updated_by: 8, updated_at: '2024-10-01' },
+  { config_id: 2, round_id: 2, min_slots: 2, max_slots: 4, updated_by: 8, updated_at: '2024-11-01' },
+  { config_id: 3, round_id: 3, min_slots: 2, max_slots: 4, updated_by: 8, updated_at: '2024-12-10' },
+]
+

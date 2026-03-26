@@ -1,21 +1,19 @@
 /**
- * Điểm khởi động ứng dụng CapReview: mount React, cấu hình Router và React Query.
+ * Điểm khởi động ứng dụng CapReview.
  */
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { RouterProvider } from 'react-router-dom'
 
+import { App } from '@/App'
 import './style.css'
-import { router } from '@/router/router'
-
-const queryClient = new QueryClient()
+import './index.css'
+import { ErrorBoundary } from '@/components/shared/ErrorBoundary'
 
 ReactDOM.createRoot(document.getElementById('app') as HTMLElement).render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
   </React.StrictMode>,
 )
 
