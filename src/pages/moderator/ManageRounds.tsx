@@ -10,6 +10,7 @@ import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { DatePicker } from '@/components/ui/date-picker'
 import {
   Dialog,
   DialogContent,
@@ -315,7 +316,13 @@ export function ManageRounds() {
 
               <div className="space-y-2">
                 <Label>Ngày mở đăng ký</Label>
-                <Input type="date" {...form.register('registration_open_at')} />
+                <Controller
+                  control={form.control}
+                  name="registration_open_at"
+                  render={({ field }) => (
+                    <DatePicker value={field.value} onChange={field.onChange} placeholder="Chọn ngày mở" />
+                  )}
+                />
                 {form.formState.errors.registration_open_at ? (
                   <p className="text-xs text-[#DC2626]">
                     {form.formState.errors.registration_open_at.message}
@@ -325,7 +332,13 @@ export function ManageRounds() {
 
               <div className="space-y-2">
                 <Label>Ngày đóng đăng ký</Label>
-                <Input type="date" {...form.register('registration_close_at')} />
+                <Controller
+                  control={form.control}
+                  name="registration_close_at"
+                  render={({ field }) => (
+                    <DatePicker value={field.value} onChange={field.onChange} placeholder="Chọn ngày đóng" />
+                  )}
+                />
                 {form.formState.errors.registration_close_at ? (
                   <p className="text-xs text-[#DC2626]">
                     {form.formState.errors.registration_close_at.message}
@@ -335,7 +348,13 @@ export function ManageRounds() {
 
               <div className="space-y-2">
                 <Label>Ngày bắt đầu review</Label>
-                <Input type="date" {...form.register('review_date_from')} />
+                <Controller
+                  control={form.control}
+                  name="review_date_from"
+                  render={({ field }) => (
+                    <DatePicker value={field.value} onChange={field.onChange} placeholder="Chọn ngày bắt đầu" />
+                  )}
+                />
                 {form.formState.errors.review_date_from ? (
                   <p className="text-xs text-[#DC2626]">{form.formState.errors.review_date_from.message}</p>
                 ) : null}
@@ -343,7 +362,13 @@ export function ManageRounds() {
 
               <div className="space-y-2">
                 <Label>Ngày kết thúc review</Label>
-                <Input type="date" {...form.register('review_date_to')} />
+                <Controller
+                  control={form.control}
+                  name="review_date_to"
+                  render={({ field }) => (
+                    <DatePicker value={field.value} onChange={field.onChange} placeholder="Chọn ngày kết thúc" />
+                  )}
+                />
                 {form.formState.errors.review_date_to ? (
                   <p className="text-xs text-[#DC2626]">{form.formState.errors.review_date_to.message}</p>
                 ) : null}

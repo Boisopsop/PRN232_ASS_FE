@@ -11,6 +11,7 @@ import React from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { DatePicker } from '@/components/ui/date-picker'
 import {
   Dialog,
   DialogContent,
@@ -430,7 +431,13 @@ export function ManageSlots() {
 
               <div className="space-y-2">
                 <Label>Ngày</Label>
-                <Input type="date" {...slotForm.register('date')} />
+                <Controller
+                  control={slotForm.control}
+                  name="date"
+                  render={({ field }) => (
+                    <DatePicker value={field.value} onChange={field.onChange} placeholder="Chọn ngày" />
+                  )}
+                />
               </div>
 
               <div className="space-y-2">
@@ -534,11 +541,23 @@ export function ManageSlots() {
               </div>
               <div className="space-y-2">
                 <Label>Từ ngày</Label>
-                <Input type="date" {...bulkForm.register('date_from')} />
+                <Controller
+                  control={bulkForm.control}
+                  name="date_from"
+                  render={({ field }) => (
+                    <DatePicker value={field.value} onChange={field.onChange} placeholder="Chọn ngày bắt đầu" />
+                  )}
+                />
               </div>
               <div className="space-y-2">
                 <Label>Đến ngày</Label>
-                <Input type="date" {...bulkForm.register('date_to')} />
+                <Controller
+                  control={bulkForm.control}
+                  name="date_to"
+                  render={({ field }) => (
+                    <DatePicker value={field.value} onChange={field.onChange} placeholder="Chọn ngày kết thúc" />
+                  )}
+                />
               </div>
               <div className="space-y-2">
                 <Label>Số nhóm tối đa</Label>
