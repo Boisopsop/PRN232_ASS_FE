@@ -183,7 +183,7 @@ export function MySchedule() {
   if (allItems.length === 0) {
     return (
       <div className="space-y-5">
-        <h1 className="font-sora text-2xl font-bold text-slate-900">Lịch của tôi</h1>
+        <h1 className="font-sora text-2xl font-bold text-foreground">Lịch của tôi</h1>
         <EmptyState
           icon={CalendarDays}
           title="Chưa có lịch đăng ký"
@@ -195,10 +195,10 @@ export function MySchedule() {
 
   return (
     <div className="space-y-5">
-      <h1 className="font-sora text-2xl font-bold text-slate-900">Lịch của tôi</h1>
+      <h1 className="font-sora text-2xl font-bold text-foreground">Lịch của tôi</h1>
 
       <Card className="space-y-3 rounded-xl p-4 shadow-sm">
-        <div className="text-sm font-medium text-slate-700">Round</div>
+        <div className="text-sm font-medium text-muted-foreground">Round</div>
         <div className="flex flex-wrap gap-2">
           <Button
             type="button"
@@ -221,7 +221,7 @@ export function MySchedule() {
           ))}
         </div>
 
-        <div className="text-sm font-medium text-slate-700">Trạng thái</div>
+        <div className="text-sm font-medium text-muted-foreground">Trạng thái</div>
         <div className="flex flex-wrap gap-2">
           {(['ALL', 'REGISTERED', 'CANCELLED'] as const).map((status) => (
             <Button
@@ -250,9 +250,9 @@ export function MySchedule() {
                   onClick={() => toggleRound(round.round_id)}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="font-sora text-lg font-semibold text-slate-900">{round.round_name}</div>
+                    <div className="font-sora text-lg font-semibold text-foreground">{round.round_name}</div>
                     <StatusBadge status={round.status} size="sm" />
-                    <span className="text-sm text-slate-500">{registeredCount} đã đăng ký</span>
+                    <span className="text-sm text-muted-foreground">{registeredCount} đã đăng ký</span>
                   </div>
                   {isOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
                 </button>
@@ -275,13 +275,13 @@ export function MySchedule() {
                           key={`${item.kind}-${item.id}`}
                           className="grid grid-cols-1 gap-3 rounded-lg border p-3 md:grid-cols-[220px_1fr_auto]"
                         >
-                          <div className="rounded-md bg-indigo-50 p-3 text-indigo-700">
+                          <div className="rounded-md bg-primary/10 p-3 text-primary">
                             <div className="text-sm capitalize">{weekdayLabel(item.slot.start_time)}</div>
                             <div className="font-semibold">{dateLabel(item.slot.start_time)}</div>
                             <div className="text-sm">{timeLabel(item.slot.start_time, item.slot.end_time)}</div>
                           </div>
-                          <div className="space-y-1 text-sm text-slate-700">
-                            <div className="font-medium text-slate-900">{item.slot.room}</div>
+                          <div className="space-y-1 text-sm text-muted-foreground">
+                            <div className="font-medium text-foreground">{item.slot.room}</div>
                             {isStudent ? (
                               <div>
                                 GV phản biện:{' '}

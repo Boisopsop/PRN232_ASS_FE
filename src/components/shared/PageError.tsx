@@ -14,12 +14,12 @@ export function PageError({
   onRetry: () => void
 }) {
   return (
-    <Card className="rounded-xl border border-[#DC2626]/20 bg-[#DC2626]/5 p-5 shadow-sm">
+    <Card className="rounded-xl border border-destructive/20 bg-destructive/5 p-5 shadow-sm">
       <div className="flex items-start gap-3">
-        <AlertTriangle className="mt-0.5 h-5 w-5 text-[#DC2626]" />
+        <AlertTriangle className="mt-0.5 h-5 w-5 text-destructive" />
         <div className="flex-1">
-          <div className="text-sm font-semibold text-[#991B1B]">Không thể tải dữ liệu</div>
-          <p className="mt-1 text-sm text-[#7F1D1D]">{error.message}</p>
+          <div className="text-sm font-semibold text-destructive">Không thể tải dữ liệu</div>
+          <p className="mt-1 text-sm text-destructive/80">{error.message}</p>
           <div className="mt-3">
             <Button type="button" variant="outline" onClick={onRetry} aria-label="Thử tải lại dữ liệu">
               <RefreshCw className="h-4 w-4" />

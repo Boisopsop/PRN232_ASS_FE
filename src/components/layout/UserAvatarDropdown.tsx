@@ -28,7 +28,7 @@ function hashString(input: string): number {
 
 function getAvatarColorClass(name: string): string {
   const palette = [
-    'bg-indigo-600',
+    'bg-primary',
     'bg-emerald-600',
     'bg-pink-600',
     'bg-amber-600',
@@ -53,13 +53,13 @@ export function UserAvatarDropdown() {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="flex items-center gap-3 rounded-lg transition-all duration-150 hover:bg-black/5"
+          className="flex items-center gap-3 rounded-lg transition-all duration-150 hover:bg-muted"
         >
           <Avatar className={cn('size-10', avatarBg)}>
             <AvatarFallback className="text-white">{initials}</AvatarFallback>
           </Avatar>
           <div className="hidden min-w-0 text-left md:block">
-            <div className="truncate text-sm font-semibold text-slate-900">
+            <div className="truncate text-sm font-semibold text-foreground">
               {currentUser?.full_name ?? ''}
             </div>
           </div>

@@ -151,8 +151,8 @@ export function ReviewerConfig() {
     <div className="space-y-5">
       <Card className="rounded-xl p-6 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h1 className="font-sora text-xl font-bold text-slate-900">Cấu hình GV Review</h1>
-          <div className="text-sm text-slate-600">Cập nhật gần nhất: {lastUpdated}</div>
+          <h1 className="font-sora text-xl font-bold text-foreground">Cấu hình GV Review</h1>
+          <div className="text-sm text-muted-foreground">Cập nhật gần nhất: {lastUpdated}</div>
         </div>
       </Card>
 
@@ -167,20 +167,20 @@ export function ReviewerConfig() {
           return (
             <Card key={round.round_id} className="rounded-xl p-5 shadow-sm">
               <div className="mb-4 flex items-center justify-between gap-2">
-                <h2 className="font-sora text-base font-semibold text-slate-900">
+                <h2 className="font-sora text-base font-semibold text-foreground">
                   Cấu hình {round.round_name}
                 </h2>
                 <StatusBadge status={round.status} size="sm" />
               </div>
 
               <div className="mb-4 grid grid-cols-2 gap-3">
-                <div className="rounded-lg border border-indigo-100 bg-indigo-50 p-3 text-center">
-                  <div className="text-2xl font-bold text-indigo-700">{config?.min_slots ?? '-'}</div>
-                  <div className="text-xs text-slate-600">slot tối thiểu</div>
+                <div className="rounded-lg border border-primary/20 bg-primary/10 p-3 text-center">
+                  <div className="text-2xl font-bold text-primary">{config?.min_slots ?? '-'}</div>
+                  <div className="text-xs text-muted-foreground">slot tối thiểu</div>
                 </div>
-                <div className="rounded-lg border border-emerald-100 bg-emerald-50 p-3 text-center">
-                  <div className="text-2xl font-bold text-emerald-700">{config?.max_slots ?? '-'}</div>
-                  <div className="text-xs text-slate-600">slot tối đa</div>
+                <div className="rounded-lg border border-secondary/30 bg-secondary/30 p-3 text-center">
+                  <div className="text-2xl font-bold text-secondary-foreground">{config?.max_slots ?? '-'}</div>
+                  <div className="text-xs text-muted-foreground">slot tối đa</div>
                 </div>
               </div>
 
@@ -190,14 +190,14 @@ export function ReviewerConfig() {
                     <label className="text-sm font-medium">Min slots</label>
                     <Input type="number" min={1} {...form.register('min_slots')} />
                     {form.formState.errors.min_slots ? (
-                      <p className="text-xs text-[#DC2626]">{form.formState.errors.min_slots.message}</p>
+                      <p className="text-xs text-destructive">{form.formState.errors.min_slots.message}</p>
                     ) : null}
                   </div>
                   <div className="space-y-1">
                     <label className="text-sm font-medium">Max slots</label>
                     <Input type="number" min={1} {...form.register('max_slots')} />
                     {form.formState.errors.max_slots ? (
-                      <p className="text-xs text-[#DC2626]">{form.formState.errors.max_slots.message}</p>
+                      <p className="text-xs text-destructive">{form.formState.errors.max_slots.message}</p>
                     ) : null}
                   </div>
                   <div className="flex gap-2">
@@ -216,11 +216,11 @@ export function ReviewerConfig() {
                 </Button>
               )}
 
-              <div className="mt-4 rounded-lg border border-black/5 bg-black/[0.02] p-3">
+              <div className="mt-4 rounded-lg border border-border bg-black/[0.02] p-3">
                 <button
                   type="button"
                   onClick={() => toggleExpand(round.round_id)}
-                  className="flex w-full items-center justify-between text-left text-sm font-medium text-slate-800"
+                  className="flex w-full items-center justify-between text-left text-sm font-medium text-foreground"
                 >
                   GV Review bị ảnh hưởng
                   {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
@@ -235,7 +235,7 @@ export function ReviewerConfig() {
                           key={`${round.round_id}-${reviewer.user_id}`}
                           className={cn(
                             'flex items-center justify-between rounded-md px-2 py-1',
-                            impacted ? 'bg-red-50 text-red-700' : 'bg-emerald-50 text-emerald-700',
+                            impacted ? 'bg-destructive/10 text-destructive' : 'bg-secondary/30 text-secondary-foreground',
                           )}
                         >
                           <span>{reviewer.full_name}</span>
@@ -252,7 +252,7 @@ export function ReviewerConfig() {
       </div>
 
       <Card className="rounded-xl p-5 shadow-sm">
-        <h2 className="mb-4 font-sora text-lg font-semibold text-slate-900">GV Review Overview</h2>
+        <h2 className="mb-4 font-sora text-lg font-semibold text-foreground">GV Review Overview</h2>
         <Table>
           <TableHeader>
             <TableRow>
@@ -274,8 +274,8 @@ export function ReviewerConfig() {
                         variant="outline"
                         className={cn(
                           ok
-                            ? 'border-[#16A34A]/30 bg-[#16A34A]/10 text-[#16A34A]'
-                            : 'border-[#DC2626]/30 bg-[#DC2626]/10 text-[#DC2626]',
+                            ? 'border-green-600/30 bg-green-600/10 text-green-600 dark:text-green-400'
+                            : 'border-destructive/30 bg-destructive/10 text-destructive',
                         )}
                       >
                         {cell.current}/{cell.min} slot

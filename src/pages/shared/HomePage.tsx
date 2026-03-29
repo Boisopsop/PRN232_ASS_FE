@@ -5,10 +5,10 @@ export function HomePage() {
   return (
     <main className="min-h-screen bg-background font-dm">
       <div className="mx-auto max-w-3xl px-6 py-10">
-        <h1 className="font-sora text-3xl font-bold text-slate-900">
+        <h1 className="font-sora text-3xl font-bold text-foreground">
           CapReview — Đăng ký phản biện đồ án
         </h1>
-        <p className="mt-2 text-slate-600">
+        <p className="mt-2 text-muted-foreground">
           Dự án frontend đã được khởi tạo (React 18 + TypeScript + Tailwind + Router + React
           Query).
         </p>

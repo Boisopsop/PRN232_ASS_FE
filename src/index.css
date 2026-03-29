@@ -7,7 +7,6 @@
 
 body {
   font-family: 'DM Sans', sans-serif;
-  background: #F5F7FF;
 }
 
 h1,
@@ -22,11 +21,11 @@ h4 {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--muted);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c7d2fe;
+  background: var(--border);
   border-radius: 3px;
 }
 

@@ -27,17 +27,17 @@ export function EmptyState({
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             aria-hidden="true"
-            className="text-slate-200"
+            className="text-muted"
           >
             <rect x="8" y="24" width="96" height="40" rx="10" className="fill-current" />
             <rect x="20" y="34" width="72" height="6" rx="3" className="fill-white/90" />
             <rect x="20" y="46" width="48" height="6" rx="3" className="fill-white/90" />
             <path d="M56 8L84 22H28L56 8Z" className="fill-indigo-200" />
           </svg>
-          <Icon className="absolute left-1/2 top-1/2 h-9 w-9 -translate-x-1/2 -translate-y-1/3 text-slate-500" />
+          <Icon className="absolute left-1/2 top-1/2 h-9 w-9 -translate-x-1/2 -translate-y-1/3 text-muted-foreground" />
         </div>
-        <div className="mt-3 text-lg font-bold text-slate-900">{title}</div>
-        <div className="mt-2 text-sm text-slate-600">{description}</div>
+        <div className="mt-3 text-lg font-bold text-foreground">{title}</div>
+        <div className="mt-2 text-sm text-muted-foreground">{description}</div>
         {action ? <div className="mt-4 w-full">{action}</div> : null}
       </div>
     </Card>

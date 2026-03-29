@@ -35,11 +35,11 @@ function safeFormat(value: string, pattern: string): string {
 }
 
 function getProgressClass(ratio: number): string {
-  if (ratio <= 0) return 'w-0 bg-[#DC2626]'
-  if (ratio < 0.35) return 'w-1/4 bg-[#DC2626]'
-  if (ratio < 0.7) return 'w-1/2 bg-[#D97706]'
-  if (ratio < 1) return 'w-3/4 bg-[#D97706]'
-  return 'w-full bg-[#16A34A]'
+  if (ratio <= 0) return 'w-0 bg-destructive'
+  if (ratio < 0.35) return 'w-1/4 bg-destructive'
+  if (ratio < 0.7) return 'w-1/2 bg-amber-600'
+  if (ratio < 1) return 'w-3/4 bg-amber-600'
+  return 'w-full bg-green-600'
 }
 
 type RowStatus = 'ok' | 'needs-reviewer' | 'empty'
@@ -51,9 +51,9 @@ function getRowStatus(hasReviewer: boolean, groupCount: number): RowStatus {
 }
 
 function rowStatusClass(status: RowStatus): string {
-  if (status === 'ok') return 'border-l-4 border-l-[#16A34A]'
-  if (status === 'needs-reviewer') return 'border-l-4 border-l-[#D97706]'
-  return 'border-l-4 border-l-[#DC2626]'
+  if (status === 'ok') return 'border-l-4 border-l-green-600'
+  if (status === 'needs-reviewer') return 'border-l-4 border-l-amber-600'
+  return 'border-l-4 border-l-destructive'
 }
 
 export function ModeratorDashboard() {
@@ -136,7 +136,7 @@ export function ModeratorDashboard() {
     <div className="space-y-5">
       <Card className="rounded-xl p-5 shadow-sm">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <h1 className="font-sora text-xl font-bold text-slate-900">Tổng quan — {semesterName}</h1>
+          <h1 className="font-sora text-xl font-bold text-foreground">Tổng quan — {semesterName}</h1>
 
           <div className="flex flex-wrap items-center gap-3">
             <Tabs value={String(selectedRoundId)} onValueChange={onChangeRound}>
@@ -166,15 +166,15 @@ export function ModeratorDashboard() {
 
       <Card className="rounded-xl p-5 shadow-sm">
         <div className="mb-3 flex items-center justify-between gap-3">
-          <h2 className="font-sora text-lg font-bold text-slate-900">Trạng thái Slot</h2>
+          <h2 className="font-sora text-lg font-bold text-foreground">Trạng thái Slot</h2>
           <Badge variant="outline" className="rounded-lg">
             {totalSlots} slot
           </Badge>
         </div>
 
-        <div className="max-h-[480px] overflow-auto rounded-lg border border-black/5">
+        <div className="max-h-[480px] overflow-auto rounded-lg border border-border">
           <Table>
-            <TableHeader className="sticky top-0 z-10 bg-white">
+            <TableHeader className="sticky top-0 z-10 bg-card">
               <TableRow>
                 <TableHead>Slot</TableHead>
                 <TableHead>Ngày & Giờ</TableHead>
@@ -195,13 +195,13 @@ export function ModeratorDashboard() {
                       <TableCell className="font-medium">#{row.slot.slot_id}</TableCell>
                       <TableCell>
                         <div>{safeFormat(row.slot.start_time, 'dd/MM/yyyy')}</div>
-                        <div className="text-xs text-slate-500">
+                        <div className="text-xs text-muted-foreground">
                           {safeFormat(row.slot.start_time, 'HH:mm')} - {safeFormat(row.slot.end_time, 'HH:mm')}
                         </div>
                       </TableCell>
                       <TableCell>{row.slot.room}</TableCell>
                       <TableCell>
-                        <div className="mb-1 text-xs text-slate-500">
+                        <div className="mb-1 text-xs text-muted-foreground">
                           {row.slot.registered_groups.length}/{row.slot.max_groups}
                         </div>
                         <div className="flex flex-wrap gap-1">
@@ -211,7 +211,7 @@ export function ModeratorDashboard() {
                             </Badge>
                           ) : (
                             row.slot.registered_groups.map((g) => (
-                              <Badge key={g.group_id} variant="outline" className="rounded-lg bg-white">
+                              <Badge key={g.group_id} variant="outline" className="rounded-lg bg-card">
                                 {g.group_name}
                               </Badge>
                             ))
@@ -221,7 +221,7 @@ export function ModeratorDashboard() {
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
                           {row.slot.registered_reviewers.length === 0 ? (
-                            <span className="text-xs font-semibold text-[#D97706]">⚠️ Chưa có GV</span>
+                            <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">⚠️ Chưa có GV</span>
                           ) : (
                             row.slot.registered_reviewers.map((rv) => (
                               <Badge key={rv.user_id} variant="secondary" className="rounded-lg">
@@ -249,14 +249,14 @@ export function ModeratorDashboard() {
                       <TableRow key={`expanded-${row.slot.slot_id}`}>
                         <TableCell colSpan={7}>
                           <div className="space-y-2 py-1">
-                            <div className="text-sm font-semibold text-slate-900">Danh sách nhóm</div>
-                            <div className="text-sm text-slate-600">
+                            <div className="text-sm font-semibold text-foreground">Danh sách nhóm</div>
+                            <div className="text-sm text-muted-foreground">
                               {row.slot.registered_groups.length > 0
                                 ? row.slot.registered_groups.map((g) => g.group_name).join(', ')
                                 : 'Chưa có nhóm'}
                             </div>
-                            <div className="text-sm font-semibold text-slate-900">Danh sách GV Review</div>
-                            <div className="text-sm text-slate-600">
+                            <div className="text-sm font-semibold text-foreground">Danh sách GV Review</div>
+                            <div className="text-sm text-muted-foreground">
                               {row.slot.registered_reviewers.length > 0
                                 ? row.slot.registered_reviewers.map((rv) => rv.full_name).join(', ')
                                 : 'Chưa có GV Review'}
@@ -309,7 +309,7 @@ export function ModeratorDashboard() {
       </Card>
 
       <Card className="rounded-xl p-5 shadow-sm">
-        <h2 className="mb-3 font-sora text-lg font-bold text-slate-900">Trạng thái GV Review</h2>
+        <h2 className="mb-3 font-sora text-lg font-bold text-foreground">Trạng thái GV Review</h2>
         <Table>
           <TableHeader>
             <TableRow>
@@ -327,7 +327,7 @@ export function ModeratorDashboard() {
               const missing = Math.max(0, r.minRequired - r.registeredCount)
               const isBelow = missing > 0
               return (
-                <TableRow key={r.reviewer.user_id} className={cn(isBelow ? 'bg-red-50' : '')}>
+                <TableRow key={r.reviewer.user_id} className={cn(isBelow ? 'bg-destructive/10' : '')}>
                   <TableCell>{r.reviewer.full_name}</TableCell>
                   <TableCell>{r.registeredCount}</TableCell>
                   <TableCell>{r.minRequired}</TableCell>
@@ -338,9 +338,9 @@ export function ModeratorDashboard() {
                   </TableCell>
                   <TableCell>
                     {isBelow ? (
-                      <span className="text-sm font-semibold text-[#DC2626]">⚠️ Thiếu {missing} slot</span>
+                      <span className="text-sm font-semibold text-destructive">⚠️ Thiếu {missing} slot</span>
                     ) : (
-                      <span className="text-sm font-semibold text-[#16A34A]">✅ Đủ</span>
+                      <span className="text-sm font-semibold text-green-600 dark:text-green-400">✅ Đủ</span>
                     )}
                   </TableCell>
                   <TableCell className="text-right">
@@ -377,7 +377,7 @@ export function ModeratorDashboard() {
       </Card>
 
       <Card className="rounded-xl p-5 shadow-sm">
-        <h2 className="mb-3 font-sora text-lg font-bold text-slate-900">Trạng thái Nhóm SV</h2>
+        <h2 className="mb-3 font-sora text-lg font-bold text-foreground">Trạng thái Nhóm SV</h2>
         <Table>
           <TableHeader>
             <TableRow>
@@ -396,7 +396,7 @@ export function ModeratorDashboard() {
               const gvhdName =
                 mockUsers.find((u) => u.user_id === g.group.gvhd_id)?.full_name ?? 'Chưa có GVHD'
               return (
-                <TableRow key={g.group.group_id} className={cn(!hasSlot ? 'bg-red-50' : '')}>
+                <TableRow key={g.group.group_id} className={cn(!hasSlot ? 'bg-destructive/10' : '')}>
                   <TableCell className="font-medium">{g.group.group_name}</TableCell>
                   <TableCell>{g.group.project_title}</TableCell>
                   <TableCell>{gvhdName}</TableCell>
@@ -406,16 +406,16 @@ export function ModeratorDashboard() {
                         {safeFormat(firstSlot.start_time, 'dd/MM HH:mm')}
                       </Badge>
                     ) : (
-                      <Badge variant="outline" className="rounded-lg bg-black/5 text-slate-600">
+                      <Badge variant="outline" className="rounded-lg bg-black/5 text-muted-foreground">
                         Chưa đăng ký
                       </Badge>
                     )}
                   </TableCell>
                   <TableCell>
                     {hasSlot ? (
-                      <span className="text-sm font-semibold text-[#16A34A]">Đã đăng ký</span>
+                      <span className="text-sm font-semibold text-green-600 dark:text-green-400">Đã đăng ký</span>
                     ) : (
-                      <span className="text-sm font-semibold text-[#DC2626]">Chưa đăng ký</span>
+                      <span className="text-sm font-semibold text-destructive">Chưa đăng ký</span>
                     )}
                   </TableCell>
                   <TableCell className="text-right">

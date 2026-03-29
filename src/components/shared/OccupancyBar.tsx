@@ -16,17 +16,17 @@ export function OccupancyBar({
   const isThreeGroup = max === 3
 
   const color = (() => {
-    if (isThreeGroup) return current >= 3 ? 'bg-[#DC2626]' : 'bg-[#16A34A]'
-    if (ratio >= 1) return 'bg-[#DC2626]'
-    if (ratio >= 0.5) return 'bg-[#D97706]'
-    return 'bg-[#16A34A]'
+    if (isThreeGroup) return current >= 3 ? 'bg-destructive' : 'bg-green-600'
+    if (ratio >= 1) return 'bg-destructive'
+    if (ratio >= 0.5) return 'bg-amber-600'
+    return 'bg-green-600'
   })()
 
   const textColor = (() => {
-    if (isThreeGroup) return current >= 3 ? 'text-[#DC2626]' : 'text-[#16A34A]'
-    if (ratio >= 1) return 'text-[#DC2626]'
-    if (ratio >= 0.5) return 'text-[#D97706]'
-    return 'text-[#16A34A]'
+    if (isThreeGroup) return current >= 3 ? 'text-destructive' : 'text-green-600 dark:text-green-400'
+    if (ratio >= 1) return 'text-destructive'
+    if (ratio >= 0.5) return 'text-amber-600 dark:text-amber-400'
+    return 'text-green-600 dark:text-green-400'
   })()
 
   const displayLabel = label ?? `${current}/${max} nhóm`

@@ -4,6 +4,7 @@
 import { Navigate, createBrowserRouter, redirect } from 'react-router-dom'
 
 import { AppLayout } from '@/components/layout/AppLayout'
+import { StudentLayout } from '@/components/layout/StudentLayout'
 import { useAuthStore } from '@/stores/authStore'
 
 import { ProtectedRoute } from '@/router/ProtectedRoute'
@@ -12,8 +13,7 @@ import { NotFoundPage } from '@/pages/NotFoundPage'
 
 import { LoginPage } from '@/pages/auth/LoginPage'
 import { StudentDashboard } from '@/pages/student/StudentDashboard'
-import { StudentSlotRegistration } from '@/pages/student/StudentSlotRegistration'
-import { MySchedule as StudentMySchedule } from '@/pages/student/MySchedule'
+import { StudentCalendar } from '@/pages/student/StudentCalendar'
 import { ReviewerDashboard } from '@/pages/reviewer/ReviewerDashboard'
 import { ReviewerSlotRegistration } from '@/pages/reviewer/ReviewerSlotRegistration'
 import { MySchedule as ReviewerMySchedule } from '@/pages/reviewer/MySchedule'
@@ -40,7 +40,7 @@ export const router = createBrowserRouter([
     element: <LoginPage />,
   },
   {
-    element: <AppLayout />,
+    element: <StudentLayout />,
     children: [
       {
         path: 'student/dashboard',
@@ -51,21 +51,18 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'student/register',
+        path: 'student/calendar',
         element: (
           <ProtectedRoute roleGroup="student">
-            <StudentSlotRegistration />
+            <StudentCalendar />
           </ProtectedRoute>
         ),
       },
-      {
-        path: 'student/schedule',
-        element: (
-          <ProtectedRoute roleGroup="student">
-            <StudentMySchedule />
-          </ProtectedRoute>
-        ),
-      },
+    ],
+  },
+  {
+    element: <AppLayout />,
+    children: [
       {
         path: 'reviewer/dashboard',
         element: (

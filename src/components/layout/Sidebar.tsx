@@ -33,7 +33,7 @@ function hashString(input: string): number {
 
 function getAvatarColorClass(name: string): string {
   const palette = [
-    'bg-indigo-600',
+    'bg-primary',
     'bg-emerald-600',
     'bg-pink-600',
     'bg-amber-600',
@@ -73,10 +73,10 @@ export function Sidebar() {
   const roleLabel = currentUser ? getRoleLabel(currentUser.role) : 'User'
 
   const sidebarContent = (
-    <div className="flex h-full flex-col bg-[#0F1B3D] text-white">
+    <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
       <div className="flex items-center gap-2 px-5 py-5">
-        <GraduationCap className="h-6 w-6 text-white" />
-        <span className="font-sora text-lg font-bold text-white">CapReview</span>
+        <GraduationCap className="h-6 w-6 text-sidebar-foreground" />
+        <span className="font-sora text-lg font-bold text-sidebar-foreground">CapReview</span>
       </div>
 
       <nav className="mt-3 flex flex-1 flex-col gap-2 px-4">
@@ -84,13 +84,13 @@ export function Sidebar() {
           <NavLink
             key={item.to}
             to={item.to}
-            end={item.to !== '/student/register' && item.to !== '/reviewer/register'}
+            end={item.to !== '/reviewer/register'}
             onClick={() => setSidebarOpen(false)}
             aria-label={`Đi tới ${item.label}`}
             className={({ isActive }) =>
               cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all duration-150 hover:bg-white/10',
-                isActive ? 'bg-indigo-600' : 'bg-transparent',
+                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all duration-150 hover:bg-sidebar-accent',
+                isActive ? 'bg-sidebar-primary text-sidebar-primary-foreground' : 'bg-transparent',
               )
             }
           >
@@ -100,15 +100,15 @@ export function Sidebar() {
         ))}
       </nav>
 
-      <div className="space-y-3 border-t border-white/10 px-4 py-4">
+      <div className="space-y-3 border-t border-sidebar-border px-4 py-4">
         <div className="flex items-center gap-3">
-          <div className={cn('flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white', avatarBg)}>
+          <div className={cn('flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-sidebar-foreground', avatarBg)}>
             {initials}
           </div>
           <div className="min-w-0 flex-1">
             <div className="truncate text-sm font-semibold">{currentUser?.full_name ?? ''}</div>
             <Badge
-              className="mt-1 border border-white/15 bg-white/10 text-white"
+              className="mt-1 border border-sidebar-border bg-sidebar-accent text-sidebar-foreground"
               variant="outline"
             >
               {roleLabel}
@@ -119,7 +119,7 @@ export function Sidebar() {
         <Button
           type="button"
           variant="secondary"
-          className="w-full rounded-lg bg-white/10 text-white hover:bg-white/20"
+          className="w-full rounded-lg bg-sidebar-accent text-sidebar-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground"
           onClick={() => logout()}
           aria-label="Đăng xuất tài khoản"
         >
@@ -131,7 +131,7 @@ export function Sidebar() {
 
   return (
     <>
-      <aside className="hidden h-screen w-[240px] bg-[#0F1B3D] md:block">
+      <aside className="hidden h-screen w-[240px] bg-sidebar md:block">
         {sidebarContent}
       </aside>
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>

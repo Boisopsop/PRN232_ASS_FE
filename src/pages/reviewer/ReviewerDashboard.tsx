@@ -32,13 +32,13 @@ function safeFormat(value: string, pattern: string): string {
 }
 
 function getProgressClass(current: number, min: number): string {
-  if (min <= 0) return current > 0 ? 'w-full bg-[#16A34A]' : 'w-0 bg-[#16A34A]'
+  if (min <= 0) return current > 0 ? 'w-full bg-green-600' : 'w-0 bg-green-600'
   const ratio = current / min
-  if (ratio <= 0) return 'w-0 bg-[#DC2626]'
-  if (ratio < 0.34) return 'w-1/4 bg-[#DC2626]'
-  if (ratio < 0.67) return 'w-1/2 bg-[#D97706]'
-  if (ratio < 1) return 'w-3/4 bg-[#D97706]'
-  return 'w-full bg-[#16A34A]'
+  if (ratio <= 0) return 'w-0 bg-destructive'
+  if (ratio < 0.34) return 'w-1/4 bg-destructive'
+  if (ratio < 0.67) return 'w-1/2 bg-amber-600'
+  if (ratio < 1) return 'w-3/4 bg-amber-600'
+  return 'w-full bg-green-600'
 }
 
 export function ReviewerDashboard() {
@@ -87,10 +87,10 @@ export function ReviewerDashboard() {
 
       const statusClass =
         registeredCount < minSlots
-          ? 'text-[#DC2626]'
+          ? 'text-destructive'
           : registeredCount === minSlots
-            ? 'text-[#D97706]'
-            : 'text-[#16A34A]'
+            ? 'text-amber-600 dark:text-amber-400'
+            : 'text-green-600 dark:text-green-400'
 
       return {
         round,
@@ -135,10 +135,10 @@ export function ReviewerDashboard() {
 
   return (
     <div className="space-y-5">
-      <Card className="rounded-2xl bg-gradient-to-r from-teal-900 via-teal-800 to-cyan-800 p-6 text-white shadow-sm">
+      <Card className="rounded-2xl bg-gradient-to-r from-primary via-primary/90 to-primary/70 p-6 text-primary-foreground shadow-sm">
         <h1 className="font-sora text-2xl font-bold">Xin chào, GV {currentUser.full_name}</h1>
         <div className="mt-3">
-          <Badge className="rounded-lg border-white/25 bg-white/10 text-white" variant="outline">
+          <Badge className="rounded-lg border-primary-foreground/25 bg-card/10 text-primary-foreground" variant="outline">
             Giảng viên Review
           </Badge>
         </div>
@@ -148,17 +148,17 @@ export function ReviewerDashboard() {
         {statsByRound.map((item) => (
           <Card key={item.round.round_id} className="rounded-xl p-5 shadow-sm">
             <div className="flex items-start justify-between gap-2">
-              <div className="text-sm font-bold text-slate-900">{item.round.round_name}</div>
+              <div className="text-sm font-bold text-foreground">{item.round.round_name}</div>
               <StatusBadge status={item.round.status} size="sm" />
             </div>
 
-            <div className="mt-3 text-3xl font-bold text-slate-900">{item.registeredCount}</div>
-            <div className="mt-1 text-xs text-slate-600">slot đã đăng ký</div>
+            <div className="mt-3 text-3xl font-bold text-foreground">{item.registeredCount}</div>
+            <div className="mt-1 text-xs text-muted-foreground">slot đã đăng ký</div>
 
-            <div className="mt-3 text-xs text-slate-600">
+            <div className="mt-3 text-xs text-muted-foreground">
               Min yêu cầu: <b>{item.minSlots}</b> slot
             </div>
-            <div className="text-xs text-slate-600">
+            <div className="text-xs text-muted-foreground">
               Tối đa: <b>{item.maxSlots}</b> slot
             </div>
 
@@ -171,7 +171,7 @@ export function ReviewerDashboard() {
             {item.registeredCount < item.minSlots ? (
               <button
                 type="button"
-                className="mt-2 text-sm font-semibold text-indigo-600 transition-all duration-150 hover:text-indigo-700"
+                className="mt-2 text-sm font-semibold text-primary transition-all duration-150 hover:text-primary"
                 onClick={() => navigate('/reviewer/register')}
               >
                 Đăng ký thêm →
@@ -186,9 +186,9 @@ export function ReviewerDashboard() {
           {warnings.map((w) => (
             <Card
               key={w.round.round_id}
-              className="rounded-xl border border-[#D97706]/25 bg-[#D97706]/10 p-4 shadow-sm"
+              className="rounded-xl border border-amber-600/25 bg-amber-600/10 p-4 shadow-sm"
             >
-              <div className="text-sm font-semibold text-[#92400E]">
+              <div className="text-sm font-semibold text-amber-700 dark:text-amber-300">
                 ⚠️ Round {w.round.round_number}: Bạn cần đăng ký thêm {w.missing} slot trước{' '}
                 {safeFormat(w.round.registration_close_at, 'dd/MM/yyyy')}
               </div>
@@ -198,17 +198,17 @@ export function ReviewerDashboard() {
       ) : null}
 
       <Card className="rounded-xl p-5 shadow-sm">
-        <h2 className="font-sora text-lg font-bold text-slate-900">Slot đã đăng ký</h2>
+        <h2 className="font-sora text-lg font-bold text-foreground">Slot đã đăng ký</h2>
 
         <div className="mt-4 space-y-3">
           {groupedRegistrations.map(({ round, rows }) => (
-            <details key={round.round_id} open className="rounded-lg border border-black/5 bg-white">
-              <summary className="cursor-pointer list-none rounded-lg px-4 py-3 text-sm font-semibold text-slate-900">
+            <details key={round.round_id} open className="rounded-lg border border-border bg-card">
+              <summary className="cursor-pointer list-none rounded-lg px-4 py-3 text-sm font-semibold text-foreground">
                 {round.round_name} ({rows.length} slot)
               </summary>
               <div className="overflow-x-auto px-2 pb-3">
                 {rows.length === 0 ? (
-                  <div className="px-3 py-3 text-sm text-slate-500">Chưa có slot đã đăng ký.</div>
+                  <div className="px-3 py-3 text-sm text-muted-foreground">Chưa có slot đã đăng ký.</div>
                 ) : (
                   <Table>
                     <TableHeader>

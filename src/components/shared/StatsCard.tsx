@@ -10,7 +10,7 @@ export function StatsCard({
   title,
   value,
   icon: Icon,
-  color = 'text-slate-900',
+  color = 'text-foreground',
   subtitle,
   trend,
 }: {
@@ -25,9 +25,9 @@ export function StatsCard({
     <Card className="rounded-xl p-5 shadow-sm transition-all duration-200 hover:-translate-y-px hover:shadow-md">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <div className="text-sm font-semibold text-slate-600">{title}</div>
-          {subtitle ? <div className="mt-1 text-xs text-slate-500">{subtitle}</div> : null}
-          <div className={cn('mt-3 text-3xl font-bold text-slate-900', color)}>{value}</div>
+          <div className="text-sm font-semibold text-muted-foreground">{title}</div>
+          {subtitle ? <div className="mt-1 text-xs text-muted-foreground">{subtitle}</div> : null}
+          <div className={cn('mt-3 text-3xl font-bold text-foreground', color)}>{value}</div>
           {trend ? (
             <div className="mt-2">
               <Badge
@@ -35,8 +35,8 @@ export function StatsCard({
                 className={cn(
                   'rounded-lg border px-2 py-0.5 text-xs font-semibold',
                   trend.isPositive
-                    ? 'border-[#16A34A]/30 bg-[#16A34A]/10 text-[#16A34A]'
-                    : 'border-[#DC2626]/30 bg-[#DC2626]/10 text-[#DC2626]',
+                    ? 'border-green-600/30 bg-green-600/10 text-green-600 dark:text-green-400'
+                    : 'border-destructive/30 bg-destructive/10 text-destructive',
                 )}
               >
                 {trend.isPositive ? '▲' : '▼'} {trend.value}
@@ -45,7 +45,7 @@ export function StatsCard({
           ) : null}
         </div>
         <div className="shrink-0">
-          <Icon className="h-7 w-7 text-slate-400" />
+          <Icon className="h-7 w-7 text-muted-foreground" />
         </div>
       </div>
     </Card>

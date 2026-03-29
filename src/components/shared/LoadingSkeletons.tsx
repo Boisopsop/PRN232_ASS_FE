@@ -5,7 +5,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 export function SlotCardSkeleton() {
   return (
-    <div className="rounded-xl border border-black/5 p-5 shadow-sm">
+    <div className="rounded-xl border border-border p-5 shadow-sm">
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-2">
           <Skeleton className="h-4 w-40" />
@@ -28,7 +28,7 @@ export function SlotCardSkeleton() {
 
 export function TableRowSkeleton() {
   return (
-    <div className="flex items-center gap-3 rounded-lg border border-black/5 bg-white p-4">
+    <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-4">
       <Skeleton className="h-3 w-12" />
       <Skeleton className="h-3 w-36" />
       <Skeleton className="h-3 w-24" />
@@ -39,7 +39,7 @@ export function TableRowSkeleton() {
 
 export function StatsCardSkeleton() {
   return (
-    <div className="rounded-xl border border-black/5 p-5 shadow-sm">
+    <div className="rounded-xl border border-border p-5 shadow-sm">
       <div className="flex items-start justify-between">
         <div className="space-y-3">
           <Skeleton className="h-4 w-32" />

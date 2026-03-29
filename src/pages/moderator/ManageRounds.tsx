@@ -78,10 +78,10 @@ const roundSchema = z
 type RoundFormValues = z.infer<typeof roundSchema>
 
 const statusHeaderClass: Record<RoundStatus, string> = {
-  UPCOMING: 'bg-blue-100 text-blue-800',
-  OPEN: 'bg-green-100 text-green-800',
-  CLOSED: 'bg-slate-100 text-slate-700',
-  COMPLETED: 'bg-purple-100 text-purple-800',
+  UPCOMING: 'bg-blue-600/20 dark:bg-blue-400/20 text-blue-600 dark:text-blue-400 dark:text-blue-300',
+  OPEN: 'bg-green-600/20 dark:bg-green-400/20 text-green-600 dark:text-green-400 dark:text-green-300',
+  CLOSED: 'bg-muted text-muted-foreground',
+  COMPLETED: 'bg-purple-600/20 dark:bg-purple-400/20 text-purple-600 dark:text-purple-400 dark:text-purple-300',
 }
 
 export function ManageRounds() {
@@ -200,7 +200,7 @@ export function ManageRounds() {
     <div className="space-y-5">
       <Card className="rounded-xl p-5 shadow-sm">
         <div className="flex items-center justify-between gap-3">
-          <h1 className="font-sora text-xl font-bold text-slate-900">Quản lý Review Round</h1>
+          <h1 className="font-sora text-xl font-bold text-foreground">Quản lý Review Round</h1>
           <Button type="button" onClick={openCreateModal}>
             <Plus className="h-4 w-4" />
             Tạo Round
@@ -222,11 +222,11 @@ export function ManageRounds() {
               </div>
               <div className="space-y-4 p-5">
                 <div className="flex items-center justify-between gap-2">
-                  <div className="font-sora text-lg font-bold text-slate-900">{round.round_name}</div>
+                  <div className="font-sora text-lg font-bold text-foreground">{round.round_name}</div>
                   <StatusBadge status={round.status} size="sm" />
                 </div>
 
-                <div className="space-y-2 text-sm text-slate-700">
+                <div className="space-y-2 text-sm text-muted-foreground">
                   <div>📝 Đăng ký: {round.registration_open_at} → {round.registration_close_at}</div>
                   <div>📅 Review: {round.review_date_from} → {round.review_date_to}</div>
                 </div>
@@ -302,7 +302,7 @@ export function ManageRounds() {
                   )}
                 />
                 {form.formState.errors.round_number ? (
-                  <p className="text-xs text-[#DC2626]">{form.formState.errors.round_number.message}</p>
+                  <p className="text-xs text-destructive">{form.formState.errors.round_number.message}</p>
                 ) : null}
               </div>
 
@@ -310,7 +310,7 @@ export function ManageRounds() {
                 <Label>Tên round</Label>
                 <Input {...form.register('round_name')} placeholder="Ví dụ: Review 1" />
                 {form.formState.errors.round_name ? (
-                  <p className="text-xs text-[#DC2626]">{form.formState.errors.round_name.message}</p>
+                  <p className="text-xs text-destructive">{form.formState.errors.round_name.message}</p>
                 ) : null}
               </div>
 
@@ -324,7 +324,7 @@ export function ManageRounds() {
                   )}
                 />
                 {form.formState.errors.registration_open_at ? (
-                  <p className="text-xs text-[#DC2626]">
+                  <p className="text-xs text-destructive">
                     {form.formState.errors.registration_open_at.message}
                   </p>
                 ) : null}
@@ -340,7 +340,7 @@ export function ManageRounds() {
                   )}
                 />
                 {form.formState.errors.registration_close_at ? (
-                  <p className="text-xs text-[#DC2626]">
+                  <p className="text-xs text-destructive">
                     {form.formState.errors.registration_close_at.message}
                   </p>
                 ) : null}
@@ -356,7 +356,7 @@ export function ManageRounds() {
                   )}
                 />
                 {form.formState.errors.review_date_from ? (
-                  <p className="text-xs text-[#DC2626]">{form.formState.errors.review_date_from.message}</p>
+                  <p className="text-xs text-destructive">{form.formState.errors.review_date_from.message}</p>
                 ) : null}
               </div>
 
@@ -370,7 +370,7 @@ export function ManageRounds() {
                   )}
                 />
                 {form.formState.errors.review_date_to ? (
-                  <p className="text-xs text-[#DC2626]">{form.formState.errors.review_date_to.message}</p>
+                  <p className="text-xs text-destructive">{form.formState.errors.review_date_to.message}</p>
                 ) : null}
               </div>
 
@@ -394,7 +394,7 @@ export function ManageRounds() {
                   )}
                 />
                 {form.formState.errors.status ? (
-                  <p className="text-xs text-[#DC2626]">{form.formState.errors.status.message}</p>
+                  <p className="text-xs text-destructive">{form.formState.errors.status.message}</p>
                 ) : null}
               </div>
             </div>

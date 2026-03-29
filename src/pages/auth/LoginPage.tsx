@@ -78,28 +78,28 @@ export function LoginPage() {
         email: 'an.sv@uni.edu',
         password: '123456',
         icon: User,
-        className: 'border-blue-200 bg-blue-50 text-blue-700',
+        className: 'border-blue-600/30 bg-blue-600/10 text-blue-600 dark:text-blue-400',
       },
       {
         roleName: 'GV Review',
         email: 'dung.gvr@uni.edu',
         password: '123456',
         icon: Users,
-        className: 'border-green-200 bg-green-50 text-green-700',
+        className: 'border-green-600/30 bg-green-600/10 text-green-600 dark:text-green-400',
       },
       {
         roleName: 'GVHD',
         email: 'lan.gvhd@uni.edu',
         password: '123456',
         icon: Wrench,
-        className: 'border-purple-200 bg-purple-50 text-purple-700',
+        className: 'border-purple-600/30 bg-purple-600/10 text-purple-600 dark:text-purple-400',
       },
       {
         roleName: 'Moderator',
         email: 'nam.mod@uni.edu',
         password: '123456',
         icon: ShieldCheck,
-        className: 'border-orange-200 bg-orange-50 text-orange-700',
+        className: 'border-orange-600/30 bg-orange-600/10 text-orange-600 dark:text-orange-400',
       },
     ],
     [],
@@ -114,9 +114,9 @@ export function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen bg-[#F5F7FF]">
+    <main className="flex min-h-screen bg-background">
       <motion.section
-        className="relative hidden w-[45%] overflow-hidden bg-[#0F1B3D] p-10 text-white lg:flex lg:flex-col"
+        className="relative hidden w-[45%] overflow-hidden bg-sidebar p-10 text-white lg:flex lg:flex-col"
         initial="hidden"
         animate="show"
         variants={{
@@ -139,10 +139,10 @@ export function LoginPage() {
 
         <motion.div
           variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
-          className="relative mt-10 h-56 rounded-2xl border border-white/20 bg-white/5"
+          className="relative mt-10 h-56 rounded-2xl border border-white/20 bg-card/5"
         >
-          <div className="absolute left-5 top-5 h-16 w-16 rounded-2xl border border-white/30 bg-indigo-500/30" />
-          <div className="absolute bottom-8 left-28 h-20 w-20 rounded-full border border-white/30 bg-indigo-400/20" />
+          <div className="absolute left-5 top-5 h-16 w-16 rounded-2xl border border-white/30 bg-primary/100/30" />
+          <div className="absolute bottom-8 left-28 h-20 w-20 rounded-full border border-white/30 bg-primary/20" />
           <div className="absolute right-10 top-12 h-24 w-24 rotate-12 rounded-lg border border-white/20 bg-sky-400/20" />
           <div className="absolute bottom-8 right-14 h-12 w-28 rounded-full border border-white/20 bg-violet-400/20" />
         </motion.div>
@@ -154,7 +154,7 @@ export function LoginPage() {
               variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}
               className="flex items-center gap-3"
             >
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-white/10">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-card/10">
                 <item.icon className="h-4 w-4" />
               </span>
               <span className="text-sm font-medium text-white/90">{item.text}</span>
@@ -169,9 +169,9 @@ export function LoginPage() {
           initial={{ x: 0 }}
           animate={{ x: [0, -8, 8, -6, 6, 0] }}
           transition={{ duration: 0.35 }}
-          className="w-full max-w-md rounded-2xl bg-white p-8 shadow-xl"
+          className="w-full max-w-md rounded-2xl bg-card p-8 shadow-xl"
         >
-          <h2 className="font-sora text-3xl font-bold text-slate-900">Đăng nhập</h2>
+          <h2 className="font-sora text-3xl font-bold text-foreground">Đăng nhập</h2>
 
           <form onSubmit={submitHandler} className="mt-6 space-y-4">
             <div className="space-y-2">
@@ -183,7 +183,7 @@ export function LoginPage() {
                 {...form.register('email')}
               />
               {form.formState.errors.email ? (
-                <p className="text-xs text-[#DC2626]">{form.formState.errors.email.message}</p>
+                <p className="text-xs text-destructive">{form.formState.errors.email.message}</p>
               ) : null}
             </div>
 
@@ -200,32 +200,32 @@ export function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-500 transition-all duration-200 hover:bg-black/5 hover:text-slate-700"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-muted-foreground transition-all duration-200 hover:bg-muted hover:text-muted-foreground"
                   aria-label="Hiện/ẩn mật khẩu"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
               {form.formState.errors.password ? (
-                <p className="text-xs text-[#DC2626]">{form.formState.errors.password.message}</p>
+                <p className="text-xs text-destructive">{form.formState.errors.password.message}</p>
               ) : null}
             </div>
 
             <Button
               type="submit"
               disabled={loginMutation.isPending}
-              className="w-full rounded-lg bg-[#4F46E5] text-white transition-all duration-200 hover:bg-[#4338CA]"
+              className="w-full rounded-lg bg-primary text-white transition-all duration-200 hover:bg-primary/90"
             >
               {loginMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
               Đăng nhập
             </Button>
 
-            {formError ? <p className="text-sm text-[#DC2626]">{formError}</p> : null}
+            {formError ? <p className="text-sm text-destructive">{formError}</p> : null}
           </form>
 
           <div className="my-6 flex items-center gap-3">
             <div className="h-px flex-1 bg-black/10" />
-            <span className="text-xs text-slate-500">hoặc dùng tài khoản demo</span>
+            <span className="text-xs text-muted-foreground">hoặc dùng tài khoản demo</span>
             <div className="h-px flex-1 bg-black/10" />
           </div>
 

@@ -61,7 +61,7 @@ export function SlotCard({
         disabled: true,
         label: conflictLabel,
         variant: 'outline' as const,
-        className: 'border-[#D97706]/30 bg-[#D97706]/10 text-[#D97706] disabled:opacity-100',
+        className: 'border-amber-600/30 bg-amber-600/10 text-amber-600 dark:text-amber-400 disabled:opacity-100',
       }
     if (isRegistered)
       return {
@@ -75,14 +75,14 @@ export function SlotCard({
         disabled: true,
         label: 'Đã đầy',
         variant: 'outline' as const,
-        className: 'border-black/10 bg-black/5 text-slate-500 disabled:opacity-100',
+        className: 'border-border bg-black/5 text-muted-foreground disabled:opacity-100',
       }
     if (slot.status === 'LOCKED')
       return {
         disabled: true,
         label: 'Đã khóa',
         variant: 'outline' as const,
-        className: 'border-black/10 bg-black/5 text-slate-500 disabled:opacity-100',
+        className: 'border-border bg-black/5 text-muted-foreground disabled:opacity-100',
       }
     return {
       disabled: false,
@@ -93,23 +93,23 @@ export function SlotCard({
   })()
 
   return (
-    <Card className="rounded-xl border border-black/5 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+    <Card className="rounded-xl border border-border p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <div className="text-sm font-semibold text-slate-900">{dateText}</div>
-          <div className="mt-1 text-xs text-slate-600">{timeText}</div>
+          <div className="text-sm font-semibold text-foreground">{dateText}</div>
+          <div className="mt-1 text-xs text-muted-foreground">{timeText}</div>
         </div>
       </div>
 
       <div className="mt-3">
-        <div className="flex items-center gap-2 text-sm font-semibold text-slate-900">
+        <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
           <span className="truncate">{slot.room}</span>
           {roomIsUrl ? (
             <a
               href={slot.room}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center justify-center rounded-md text-slate-500 transition-all duration-200 hover:text-slate-900"
+              className="inline-flex items-center justify-center rounded-md text-muted-foreground transition-all duration-200 hover:text-foreground"
               aria-label="Mở link phòng"
             >
               <ExternalLink className="h-4 w-4" />
@@ -122,7 +122,7 @@ export function SlotCard({
         <OccupancyBar current={slot.current_group_count} max={slot.max_groups} />
 
         <div className="flex items-center gap-2">
-          <Badge variant="secondary" className="rounded-lg bg-indigo-50 text-indigo-700">
+          <Badge variant="secondary" className="rounded-lg bg-primary/10 text-primary">
             {mode === 'reviewer'
               ? `${reviewerCount}/${slot.max_reviewers} giảng viên`
               : `${reviewerCount} phản biện đã đăng ký`}
@@ -132,10 +132,10 @@ export function SlotCard({
         {mode === 'reviewer' ? (
           <div className="flex flex-wrap gap-2">
             {groupChips.length === 0 ? (
-              <div className="text-xs text-slate-500">Chưa có nhóm đăng ký</div>
+              <div className="text-xs text-muted-foreground">Chưa có nhóm đăng ký</div>
             ) : (
               groupChips.map((g) => (
-                <Badge key={g.group_id} variant="outline" className="rounded-lg bg-white">
+                <Badge key={g.group_id} variant="outline" className="rounded-lg bg-card">
                   {g.group_name}
                 </Badge>
               ))
@@ -144,7 +144,7 @@ export function SlotCard({
         ) : null}
 
         {isConflict ? (
-          <div className="rounded-lg border border-[#D97706]/20 bg-[#D97706]/10 p-3 text-sm text-[#B45309]">
+          <div className="rounded-lg border border-amber-600/20 bg-amber-600/10 p-3 text-sm text-amber-700 dark:text-amber-300">
             ⚠️ Bạn là GVHD của {conflictGroupName ?? 'nhóm'} trong slot này
           </div>
         ) : null}

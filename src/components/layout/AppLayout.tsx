@@ -13,7 +13,7 @@ export function AppLayout(): ReactElement {
   const location = useLocation()
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#F5F7FF]">
+    <div className="flex h-screen overflow-hidden bg-background">
       <Sidebar />
       <div className="flex flex-1 flex-col overflow-hidden">
         <TopBar />

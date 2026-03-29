@@ -29,18 +29,18 @@ function metaByType(type: Notification['type']) {
   switch (type) {
     case 'ALERT':
       return {
-        borderClass: 'border-[#DC2626]',
+        borderClass: 'border-destructive',
         icon: OctagonAlert,
       }
     case 'REMINDER':
       return {
-        borderClass: 'border-[#D97706]',
+        borderClass: 'border-amber-600',
         icon: BellRing,
       }
     case 'INFO':
     default:
       return {
-        borderClass: 'border-[#2563EB]',
+        borderClass: 'border-blue-600',
         icon: Info,
       }
   }
@@ -133,7 +133,7 @@ export function NotificationsPage() {
     <div className="space-y-5">
       <Card className="rounded-xl p-6 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h1 className="font-sora text-xl font-bold text-slate-900">Trung tâm Thông báo</h1>
+          <h1 className="font-sora text-xl font-bold text-foreground">Trung tâm Thông báo</h1>
           <Button type="button" variant="outline" onClick={() => void markAllAsRead()}>
             Đánh dấu tất cả đã đọc
           </Button>
@@ -159,7 +159,7 @@ export function NotificationsPage() {
             onClick={() => setFormOpen((prev) => !prev)}
             className="flex w-full items-center justify-between text-left"
           >
-            <div className="font-sora text-base font-semibold text-slate-900">Gửi nhắc nhở</div>
+            <div className="font-sora text-base font-semibold text-foreground">Gửi nhắc nhở</div>
             {formOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </button>
 
@@ -239,14 +239,14 @@ export function NotificationsPage() {
                 className={cn(
                   'cursor-pointer rounded-xl border-l-4 p-4 shadow-sm transition-all duration-200',
                   meta.borderClass,
-                  notification.is_read ? 'bg-white' : 'bg-indigo-50',
+                  notification.is_read ? 'bg-card' : 'bg-primary/10',
                 )}
                 onClick={() => markOneAsRead(notification.notification_id)}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-3">
-                    <div className="rounded-md bg-white/80 p-2">
-                      <Icon className="h-4 w-4 text-slate-700" />
+                    <div className="rounded-md bg-card/80 p-2">
+                      <Icon className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
@@ -257,14 +257,14 @@ export function NotificationsPage() {
                           {notification.type}
                         </Badge>
                       </div>
-                      <p className="text-sm text-slate-700">{notification.message}</p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-sm text-muted-foreground">{notification.message}</p>
+                      <p className="text-xs text-muted-foreground">
                         {format(parseISO(notification.created_at), 'dd/MM/yyyy HH:mm')}
                       </p>
                     </div>
                   </div>
                   {!notification.is_read ? (
-                    <span className="mt-1 h-2 w-2 rounded-full bg-indigo-600" />
+                    <span className="mt-1 h-2 w-2 rounded-full bg-primary" />
                   ) : null}
                 </div>
               </Card>
@@ -273,7 +273,7 @@ export function NotificationsPage() {
         </div>
       )}
 
-      <div className="text-xs text-slate-500">Chưa đọc: {unreadCount}</div>
+      <div className="text-xs text-muted-foreground">Chưa đọc: {unreadCount}</div>
     </div>
   )
 }

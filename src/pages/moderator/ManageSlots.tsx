@@ -315,7 +315,7 @@ export function ManageSlots() {
     <div className="space-y-5">
       <Card className="rounded-xl p-5 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="font-sora text-xl font-bold text-slate-900">Quản lý Slot</h1>
+          <h1 className="font-sora text-xl font-bold text-foreground">Quản lý Slot</h1>
           <div className="flex flex-wrap gap-2">
             <Button type="button" onClick={openCreateModal}>
               <Plus className="h-4 w-4" />
@@ -356,7 +356,7 @@ export function ManageSlots() {
             </TableHeader>
             <TableBody>
               {slots.map((slot) => (
-                <TableRow key={slot.slot_id} className="hover:bg-indigo-50/40">
+                <TableRow key={slot.slot_id} className="hover:bg-primary/10/40">
                   <TableCell>{slot.slot_id}</TableCell>
                   <TableCell>{slot.start_time.slice(0, 10)}</TableCell>
                   <TableCell>{slot.start_time.slice(11, 16)}</TableCell>
@@ -367,7 +367,7 @@ export function ManageSlots() {
                         href={slot.room}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-700"
+                        className="inline-flex items-center gap-1 text-primary hover:text-primary"
                       >
                         Google Meet <ExternalLink className="h-3.5 w-3.5" />
                       </a>
@@ -448,14 +448,14 @@ export function ManageSlots() {
                 <Label>Giờ kết thúc</Label>
                 <Input type="time" {...slotForm.register('end_time')} />
                 {slotForm.formState.errors.end_time ? (
-                  <p className="text-xs text-[#DC2626]">{slotForm.formState.errors.end_time.message}</p>
+                  <p className="text-xs text-destructive">{slotForm.formState.errors.end_time.message}</p>
                 ) : null}
               </div>
 
               <div className="space-y-2 md:col-span-2">
                 <Label>Phòng</Label>
                 <Input {...slotForm.register('room')} placeholder="B4-201 hoặc https://meet.google.com/..." />
-                <p className="text-xs text-slate-500">Nhập tên phòng hoặc link Google Meet</p>
+                <p className="text-xs text-muted-foreground">Nhập tên phòng hoặc link Google Meet</p>
               </div>
 
               <div className="space-y-2">
@@ -605,12 +605,12 @@ export function ManageSlots() {
               </div>
             </div>
 
-            <div className="rounded-lg border border-black/5 bg-black/[0.02] p-3">
-              <div className="mb-2 text-sm font-semibold text-slate-800">Preview slot sẽ tạo</div>
+            <div className="rounded-lg border border-border bg-black/[0.02] p-3">
+              <div className="mb-2 text-sm font-semibold text-foreground">Preview slot sẽ tạo</div>
               {previewBulkSlots.length === 0 ? (
-                <div className="text-sm text-slate-500">Chưa có dữ liệu preview.</div>
+                <div className="text-sm text-muted-foreground">Chưa có dữ liệu preview.</div>
               ) : (
-                <div className="max-h-40 space-y-1 overflow-y-auto text-sm text-slate-700">
+                <div className="max-h-40 space-y-1 overflow-y-auto text-sm text-muted-foreground">
                   {previewBulkSlots.map((p, idx) => (
                     <div key={`${p.date}-${p.start}-${idx}`}>
                       {p.date} · {p.start} - {p.end}

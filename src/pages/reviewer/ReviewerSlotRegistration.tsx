@@ -121,8 +121,8 @@ export function ReviewerSlotRegistration() {
   return (
     <div className="space-y-5">
       <Card className="rounded-xl p-5 shadow-sm">
-        <h1 className="font-sora text-xl font-bold text-slate-900">Đăng ký slot phản biện</h1>
-        <p className="mt-1 text-sm text-slate-600">Chọn round và đăng ký slot phù hợp với lịch của bạn.</p>
+        <h1 className="font-sora text-xl font-bold text-foreground">Đăng ký slot phản biện</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Chọn round và đăng ký slot phù hợp với lịch của bạn.</p>
 
         <div className="mt-4 flex flex-wrap gap-2">
           {rounds.map((round) => {
@@ -141,14 +141,14 @@ export function ReviewerSlotRegistration() {
                 className={cn(
                   'inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-semibold transition-all duration-150',
                   isActive && isOpen
-                    ? 'border-indigo-600 bg-indigo-600 text-white'
+                    ? 'border-primary bg-primary text-white'
                     : isUpcoming
-                      ? 'cursor-not-allowed border-black/10 bg-black/5 text-slate-500'
-                      : 'border-black/10 bg-white text-slate-700 hover:bg-black/5',
+                      ? 'cursor-not-allowed border-border bg-black/5 text-muted-foreground'
+                      : 'border-border bg-card text-muted-foreground hover:bg-muted',
                 )}
               >
                 Round {round.round_number}
-                {isCompleted ? <CheckCircle2 className="h-4 w-4 text-[#16A34A]" /> : null}
+                {isCompleted ? <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" /> : null}
               </button>
             )
           })}
@@ -156,8 +156,8 @@ export function ReviewerSlotRegistration() {
       </Card>
 
       {isAtMax ? (
-        <Card className="rounded-xl border border-[#DC2626]/25 bg-[#DC2626]/10 p-4 shadow-sm">
-          <div className="text-sm font-semibold text-[#991B1B]">
+        <Card className="rounded-xl border border-destructive/25 bg-destructive/10 p-4 shadow-sm">
+          <div className="text-sm font-semibold text-destructive">
             ⛔ Bạn đã đạt giới hạn tối đa {maxSlots} slot cho Round này.
           </div>
         </Card>
@@ -173,7 +173,7 @@ export function ReviewerSlotRegistration() {
         ) : slotsQuery.isError ? (
           <Card className="rounded-xl p-6 shadow-sm">
             <div className="flex flex-col items-center gap-3 text-center">
-              <p className="text-sm text-slate-700">Không thể tải danh sách slot. Vui lòng thử lại.</p>
+              <p className="text-sm text-muted-foreground">Không thể tải danh sách slot. Vui lòng thử lại.</p>
               <Button
                 type="button"
                 variant="outline"

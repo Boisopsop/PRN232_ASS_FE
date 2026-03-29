@@ -6,6 +6,7 @@ import { Menu } from 'lucide-react'
 
 import { NotificationBell } from '@/components/layout/NotificationBell'
 import { UserAvatarDropdown } from '@/components/layout/UserAvatarDropdown'
+import { ThemeToggle } from '@/components/shared/ThemeToggle'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { useUiStore } from '@/stores/uiStore'
 
@@ -15,10 +16,10 @@ export function TopBar() {
   const fetchingCount = useIsFetching()
 
   return (
-    <header className="relative border-b border-black/5 bg-white">
+    <header className="relative border-b border-border bg-background">
       {fetchingCount > 0 ? (
         <div
-          className="absolute left-0 top-0 h-0.5 w-full origin-left animate-pulse bg-indigo-600"
+          className="absolute left-0 top-0 h-0.5 w-full origin-left animate-pulse bg-primary"
           role="status"
           aria-label="Đang tải dữ liệu"
         />
@@ -27,17 +28,18 @@ export function TopBar() {
         <div className="flex min-w-0 items-center gap-3">
           <button
             type="button"
-            className="rounded-lg p-2 transition-all duration-150 hover:bg-black/5 md:hidden"
+            className="rounded-lg p-2 transition-all duration-150 hover:bg-accent md:hidden"
             onClick={toggleSidebar}
             aria-label="Mở menu điều hướng"
           >
-            <Menu className="h-5 w-5 text-slate-900" />
+            <Menu className="h-5 w-5 text-foreground" />
           </button>
 
-          <h1 className="truncate font-sora text-base font-bold text-slate-900">{title}</h1>
+          <h1 className="truncate font-sora text-base font-bold text-foreground">{title}</h1>
         </div>
 
         <div className="flex items-center gap-3">
+          <ThemeToggle />
           <NotificationBell />
           <UserAvatarDropdown />
         </div>

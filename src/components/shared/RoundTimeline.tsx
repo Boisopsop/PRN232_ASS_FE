@@ -31,9 +31,9 @@ export function RoundTimeline({ rounds }: { rounds: ReviewRound[] }) {
           const prevNormalized = prev?.status.trim().toUpperCase()
           const lineColor =
             prevNormalized === 'COMPLETED'
-              ? 'bg-[#16A34A]'
+              ? 'bg-green-600'
               : prevNormalized === 'OPEN'
-                ? 'bg-[#2563EB]'
+                ? 'bg-blue-600'
                 : 'bg-black/10'
 
           return (
@@ -45,23 +45,23 @@ export function RoundTimeline({ rounds }: { rounds: ReviewRound[] }) {
                 aria-label={`Chọn vòng ${round.round_number}`}
               >
                 {normalized === 'COMPLETED' ? (
-                  <CheckCircle2 className={cn('h-7 w-7', isActive ? 'text-[#16A34A]' : 'text-[#16A34A]/70')} />
+                  <CheckCircle2 className={cn('h-7 w-7', isActive ? 'text-green-600 dark:text-green-400' : 'text-green-600 dark:text-green-400/70')} />
                 ) : normalized === 'OPEN' ? (
                   <div className="relative flex h-9 w-9 items-center justify-center">
-                    <Circle className={cn('h-9 w-9 text-[#2563EB]/35')} />
+                    <Circle className={cn('h-9 w-9 text-blue-600 dark:text-blue-400/35')} />
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div
                         className={cn(
-                          'h-2.5 w-2.5 rounded-full bg-[#2563EB] animate-pulse',
+                          'h-2.5 w-2.5 rounded-full bg-blue-600 animate-pulse',
                           isActive ? 'opacity-100' : 'opacity-80',
                         )}
                       />
                     </div>
                   </div>
                 ) : (
-                  <Circle className={cn('h-9 w-9 text-slate-300', isActive ? 'text-slate-400' : '')} />
+                  <Circle className={cn('h-9 w-9 text-muted-foreground/50', isActive ? 'text-muted-foreground' : '')} />
                 )}
-                <div className={cn('text-xs font-semibold', isActive ? 'text-slate-900' : 'text-slate-500')}>
+                <div className={cn('text-xs font-semibold', isActive ? 'text-foreground' : 'text-muted-foreground')}>
                   V{round.round_number}
                 </div>
               </button>
@@ -71,7 +71,7 @@ export function RoundTimeline({ rounds }: { rounds: ReviewRound[] }) {
                   <div className={cn('h-full', lineColor)} />
                 </div>
               ) : null}
-              <div className={cn('mt-1 text-[11px] text-center', isActive ? 'text-slate-700' : 'text-slate-500')}>
+              <div className={cn('mt-1 text-[11px] text-center', isActive ? 'text-muted-foreground' : 'text-muted-foreground')}>
                 {round.round_name}
               </div>
             </div>

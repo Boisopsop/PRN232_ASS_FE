@@ -19,13 +19,13 @@ export function NotificationBell() {
     <div className="relative">
       <button
         type="button"
-        className="relative rounded-lg p-2 transition-all duration-150 hover:bg-black/5"
+        className="relative rounded-lg p-2 transition-all duration-150 hover:bg-muted"
         aria-label="Mở thông báo"
         onClick={() => setIsOpen((v) => !v)}
       >
-        <Bell className="h-5 w-5 text-slate-900" />
+        <Bell className="h-5 w-5 text-foreground" />
         {unreadCount > 0 ? (
-          <span className="absolute right-1 top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#DC2626] px-1 text-[11px] font-bold text-white">
+          <span className="absolute right-1 top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[11px] font-bold text-white">
             {unreadCount}
           </span>
         ) : null}

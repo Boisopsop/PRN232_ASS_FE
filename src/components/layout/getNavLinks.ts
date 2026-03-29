@@ -16,8 +16,7 @@ export function getNavLinks(role: UserRole): NavLinkItem[] {
   if (role === 'STUDENT') {
     return [
       { to: '/student/dashboard', label: 'Tổng quan', Icon: LayoutDashboard },
-      { to: '/student/register', label: 'Đăng ký Slot', Icon: CalendarPlus },
-      { to: '/student/schedule', label: 'Lịch của tôi', Icon: Calendar },
+      { to: '/student/calendar', label: 'Lịch đăng ký', Icon: Calendar },
     ]
   }
 

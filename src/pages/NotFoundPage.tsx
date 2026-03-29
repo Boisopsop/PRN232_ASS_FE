@@ -19,10 +19,10 @@ export function NotFoundPage() {
 
   return (
     <div className="flex min-h-[75vh] items-center justify-center px-4">
-      <div className="w-full max-w-xl rounded-2xl border border-black/5 bg-white p-8 text-center shadow-sm">
-        <div className="font-sora text-7xl font-bold text-indigo-600">404</div>
-        <h1 className="mt-3 font-sora text-2xl font-bold text-slate-900">Trang không tồn tại</h1>
-        <p className="mt-2 text-sm text-slate-600">
+      <div className="w-full max-w-xl rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
+        <div className="font-sora text-7xl font-bold text-primary">404</div>
+        <h1 className="mt-3 font-sora text-2xl font-bold text-foreground">Trang không tồn tại</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
           Đường dẫn bạn truy cập không còn khả dụng hoặc đã bị thay đổi.
         </p>
         <div className="mt-6">

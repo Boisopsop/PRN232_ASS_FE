@@ -43,10 +43,10 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   public render(): ReactNode {
     if (this.state.hasError) {
       return (
-        <div className="flex min-h-screen items-center justify-center bg-[#F5F7FF] p-4">
-          <div className="w-full max-w-xl rounded-2xl border border-black/5 bg-white p-8 text-center shadow-sm">
-            <h1 className="font-sora text-2xl font-bold text-slate-900">Ứng dụng gặp sự cố</h1>
-            <p className="mt-2 text-sm text-slate-600">{this.state.message}</p>
+        <div className="flex min-h-screen items-center justify-center bg-background p-4">
+          <div className="w-full max-w-xl rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
+            <h1 className="font-sora text-2xl font-bold text-foreground">Ứng dụng gặp sự cố</h1>
+            <p className="mt-2 text-sm text-muted-foreground">{this.state.message}</p>
             <div className="mt-6">
               <Button type="button" onClick={this.handleReload} aria-label="Tải lại toàn bộ trang">
                 Tải lại trang

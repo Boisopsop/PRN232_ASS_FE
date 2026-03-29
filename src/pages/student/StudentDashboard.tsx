@@ -114,8 +114,8 @@ export function StudentDashboard() {
   if (!group) {
     return (
       <Card className="rounded-2xl p-6 shadow-sm">
-        <h1 className="font-sora text-xl font-bold text-slate-900">Xin chào, {currentUser.full_name}!</h1>
-        <p className="mt-2 text-sm text-slate-600">Bạn chưa được phân vào nhóm nào trong học kỳ hiện tại.</p>
+        <h1 className="font-sora text-xl font-bold text-foreground">Xin chào, {currentUser.full_name}!</h1>
+        <p className="mt-2 text-sm text-muted-foreground">Bạn chưa được phân vào nhóm nào trong học kỳ hiện tại.</p>
       </Card>
     )
   }
@@ -126,13 +126,13 @@ export function StudentDashboard() {
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.35 }}
-        className="rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-500 p-6 text-white shadow-sm"
+        className="rounded-2xl bg-gradient-to-r from-primary via-primary/90 to-primary/70 p-6 text-primary-foreground shadow-sm"
       >
         <h1 className="font-sora text-2xl font-bold">Xin chào, {currentUser.full_name}! 👋</h1>
-        <p className="mt-2 text-sm text-white/90">
+        <p className="mt-2 text-sm text-primary-foreground/90">
           {group.group_name} · {group.project_title}
         </p>
-        <p className="mt-1 text-xs text-white/80">GVHD: {gvhdName}</p>
+        <p className="mt-1 text-xs text-primary-foreground/80">GVHD: {gvhdName}</p>
       </motion.section>
 
       <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -159,24 +159,24 @@ export function StudentDashboard() {
       <Card className="rounded-2xl p-5 shadow-sm">
         <RoundTimeline rounds={rounds} />
         {openRound ? (
-          <div className="mt-3 text-sm text-slate-600">
+          <div className="mt-3 text-sm text-muted-foreground">
             {openSlotCountInActiveRound} slot còn trống trong <b>{openRound.round_name}</b>
           </div>
         ) : (
-          <div className="mt-3 text-sm text-slate-600">Hiện chưa có round ở trạng thái mở đăng ký.</div>
+          <div className="mt-3 text-sm text-muted-foreground">Hiện chưa có round ở trạng thái mở đăng ký.</div>
         )}
       </Card>
 
       {openRound && !hasRegisteredInOpenRound ? (
-        <Card className="rounded-2xl border border-[#D97706]/25 bg-[#D97706]/10 p-4 shadow-sm">
+        <Card className="rounded-2xl border border-amber-600/25 bg-amber-600/10 p-4 shadow-sm">
           <div className="flex flex-col items-start justify-between gap-3 md:flex-row md:items-center">
-            <div className="text-sm font-semibold text-[#92400E]">
+            <div className="text-sm font-semibold text-amber-700 dark:text-amber-300">
               ⚠️ Nhóm bạn chưa đăng ký slot cho {openRound.round_name}!
             </div>
             <Button
               type="button"
-              className="rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
-              onClick={() => navigate('/student/register')}
+              className="rounded-lg bg-primary text-white hover:bg-primary/90"
+              onClick={() => navigate('/student/calendar')}
             >
               Đăng ký ngay →
             </Button>
@@ -186,7 +186,7 @@ export function StudentDashboard() {
 
       {registrationRows.length > 0 ? (
         <Card className="rounded-2xl p-5 shadow-sm">
-          <h2 className="font-sora text-lg font-bold text-slate-900">Slot đã đăng ký</h2>
+          <h2 className="font-sora text-lg font-bold text-foreground">Slot đã đăng ký</h2>
 
           <div className="mt-4 overflow-x-auto">
             <Table>

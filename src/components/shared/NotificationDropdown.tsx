@@ -23,17 +23,17 @@ function getTypeMeta(type: string): {
   const normalized = type.trim().toUpperCase()
   if (normalized === 'ALERT')
     return {
-      colorBgClass: 'bg-[#DC2626]',
-      colorTextClass: 'text-[#DC2626]',
+      colorBgClass: 'bg-destructive',
+      colorTextClass: 'text-destructive',
       Icon: AlertTriangle,
     }
   if (normalized === 'REMINDER')
     return {
-      colorBgClass: 'bg-[#D97706]',
-      colorTextClass: 'text-[#D97706]',
+      colorBgClass: 'bg-amber-600',
+      colorTextClass: 'text-amber-600 dark:text-amber-400',
       Icon: Bell,
     }
-  return { colorBgClass: 'bg-[#4F46E5]', colorTextClass: 'text-[#4F46E5]', Icon: Info }
+  return { colorBgClass: 'bg-primary', colorTextClass: 'text-primary', Icon: Info }
 }
 
 function getRelativeTime(iso: string): string {
@@ -76,19 +76,19 @@ export function NotificationDropdown({
   if (!isOpen) return null
 
   return (
-    <div ref={panelRef} className="absolute right-0 top-full z-50 w-80 rounded-xl bg-white shadow-xl ring-1 ring-black/5">
-      <div className="flex items-center justify-between gap-3 border-b border-black/5 px-4 py-3">
+    <div ref={panelRef} className="absolute right-0 top-full z-50 w-80 rounded-xl bg-card shadow-xl ring-1 ring-black/5">
+      <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
         <div className="flex items-center gap-2">
-          <div className="text-sm font-bold text-slate-900">Thông báo</div>
+          <div className="text-sm font-bold text-foreground">Thông báo</div>
           {unreadCount > 0 ? (
-            <Badge className="rounded-full bg-[#DC2626]/10 text-[#DC2626]" variant="outline">
+            <Badge className="rounded-full bg-destructive/10 text-destructive" variant="outline">
               {unreadCount}
             </Badge>
           ) : null}
         </div>
         <button
           type="button"
-          className="rounded-lg bg-black/5 px-2 py-1 text-xs font-semibold text-slate-700 transition-all duration-150 hover:bg-black/10 disabled:opacity-50"
+          className="rounded-lg bg-black/5 px-2 py-1 text-xs font-semibold text-muted-foreground transition-all duration-150 hover:bg-black/10 disabled:opacity-50"
           onClick={() => markAllAsRead.mutate({ user_id })}
           disabled={notifications.every((n) => n.is_read)}
         >
@@ -98,7 +98,7 @@ export function NotificationDropdown({
 
       <div className="max-h-96 overflow-y-auto px-2 py-2">
         {notifications.length === 0 ? (
-          <div className="px-3 py-6 text-center text-sm text-slate-600">Không có thông báo</div>
+          <div className="px-3 py-6 text-center text-sm text-muted-foreground">Không có thông báo</div>
         ) : (
           notifications.map((n: NotificationType) => {
             const meta = getTypeMeta(n.type)
@@ -109,8 +109,8 @@ export function NotificationDropdown({
                 type="button"
                 onClick={() => onMarkOneRead(n.notification_id)}
                 className={[
-                  'group flex w-full items-start gap-3 rounded-lg px-3 py-3 text-left transition-all duration-150 hover:bg-indigo-50',
-                  isUnread ? 'bg-indigo-50' : 'bg-white',
+                  'group flex w-full items-start gap-3 rounded-lg px-3 py-3 text-left transition-all duration-150 hover:bg-primary/10',
+                  isUnread ? 'bg-primary/10' : 'bg-card',
                 ].join(' ')}
               >
                 <span className={['mt-2 h-7 w-1 rounded-full', meta.colorBgClass].join(' ')} />
@@ -118,15 +118,15 @@ export function NotificationDropdown({
                   <meta.Icon className={['mt-0.5 h-4 w-4 shrink-0', meta.colorTextClass].join(' ')} />
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <div className="truncate text-sm font-semibold text-slate-900">{n.title}</div>
+                      <div className="truncate text-sm font-semibold text-foreground">{n.title}</div>
                       {isUnread ? (
-                        <span className="shrink-0 rounded-full bg-[#4F46E5]/15 px-2 py-0.5 text-[10px] font-bold text-[#4F46E5]">
+                        <span className="shrink-0 rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-bold text-primary">
                           Mới
                         </span>
                       ) : null}
                     </div>
-                    <div className="mt-1 line-clamp-2 text-xs text-slate-600">{n.message}</div>
-                    <div className="mt-2 text-[11px] text-slate-500">{getRelativeTime(n.created_at)}</div>
+                    <div className="mt-1 line-clamp-2 text-xs text-muted-foreground">{n.message}</div>
+                    <div className="mt-2 text-[11px] text-muted-foreground">{getRelativeTime(n.created_at)}</div>
                   </div>
                 </div>
               </button>
@@ -135,14 +135,14 @@ export function NotificationDropdown({
         )}
       </div>
 
-      <div className="flex items-center justify-between gap-3 border-t border-black/5 px-4 py-3">
+      <div className="flex items-center justify-between gap-3 border-t border-border px-4 py-3">
         <Link
           to="/moderator/notifications"
-          className="text-sm font-semibold text-indigo-600 transition-all duration-150 hover:text-indigo-700"
+          className="text-sm font-semibold text-primary transition-all duration-150 hover:text-primary"
         >
           Xem tất cả →
         </Link>
-        <button type="button" className="text-sm font-semibold text-slate-500" onClick={onClose}>
+        <button type="button" className="text-sm font-semibold text-muted-foreground" onClick={onClose}>
           Đóng
         </button>
       </div>
