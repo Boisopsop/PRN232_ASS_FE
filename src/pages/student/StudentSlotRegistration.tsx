@@ -159,10 +159,10 @@ export function StudentSlotRegistration() {
 
       {activeRound && groupRegistrationInRound && registeredSlotSummary ? (
         <Card className="rounded-xl border border-green-600/30 bg-green-600/10 p-4 shadow-sm">
-          <div className="text-sm font-semibold text-green-600 dark:text-green-400 dark:text-green-400">
+          <div className="text-sm font-semibold text-green-600 dark:text-green-400">
             ✅ Nhóm bạn đã đăng ký slot cho {activeRound.round_name}
           </div>
-          <div className="mt-2 text-sm text-green-600 dark:text-green-400 dark:text-green-400">
+          <div className="mt-2 text-sm text-green-600 dark:text-green-400">
             {registeredSlotSummary.date} · {registeredSlotSummary.time} · {registeredSlotSummary.room}
           </div>
         </Card>

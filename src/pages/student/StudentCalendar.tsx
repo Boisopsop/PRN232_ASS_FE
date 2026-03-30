@@ -3,6 +3,7 @@
  * Gộp trang "Đăng ký Slot" và "Lịch của tôi" thành 1 trang duy nhất.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   addMonths,
   subMonths,
@@ -27,6 +28,10 @@ import {
   Users,
   FileText,
   Info,
+  XCircle,
+  CheckCircle2,
+  AlertTriangle,
+  BookOpen,
 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -40,6 +45,16 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
+import { Calendar } from '@/components/ui/calendar'
+import { Separator } from '@/components/ui/separator'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { useRounds } from '@/hooks/useRounds'
 import { useSlotsForRound, useRegisterGroupSlot, useCancelGroupRegistration } from '@/hooks/useSlots'
@@ -253,6 +268,17 @@ export function StudentCalendar() {
   }
 
   return (
+    <Tabs defaultValue="calendar" className="space-y-4">
+      <TabsList>
+        <TabsTrigger value="calendar">📅 Lịch tháng</TabsTrigger>
+        <TabsTrigger value="list">📋 Danh sách Slot</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="list">
+        <SlotBookingPage />
+      </TabsContent>
+
+      <TabsContent value="calendar">
     <div className="space-y-5">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -276,7 +302,7 @@ export function StudentCalendar() {
             >
               <ChevronLeft className="h-4 w-4 text-muted-foreground" />
             </button>
-            <span className="min-w-[140px] text-center text-sm font-semibold text-foreground">
+            <span className="min-w-35 text-center text-sm font-semibold text-foreground">
               {format(monthBase, 'MMMM yyyy', { locale: vi })}
             </span>
             <button
@@ -294,7 +320,7 @@ export function StudentCalendar() {
             value={String(selectedRoundId)}
             onValueChange={(val) => setSelectedRoundId(Number(val))}
           >
-            <SelectTrigger className="w-[220px]">
+            <SelectTrigger className="w-55">
               <SelectValue placeholder="Chọn round" />
             </SelectTrigger>
             <SelectContent>
@@ -384,7 +410,7 @@ export function StudentCalendar() {
                     disabled={!inMonth || !hasSlots}
                     onClick={() => handleDateClick(day)}
                     className={cn(
-                      'relative flex min-h-[80px] flex-col items-start border-b border-r border-border p-1.5 text-left transition-colors',
+                      'relative flex min-h-20 flex-col items-start border-b border-r border-border p-1.5 text-left transition-colors',
                       !inMonth && 'bg-muted/30 text-muted-foreground/40',
                       inMonth && 'hover:bg-muted/50',
                       isSelected && 'bg-primary/10',
@@ -563,6 +589,8 @@ export function StudentCalendar() {
         isLoading={cancelMutation.isPending}
       />
     </div>
+      </TabsContent>
+    </Tabs>
   )
 }
 
@@ -596,7 +624,7 @@ function SlotDetailPanel({
   return (
     <Card className="overflow-hidden rounded-xl shadow-sm">
       {/* Header image / room */}
-      <div className="relative bg-gradient-to-br from-primary/80 to-primary px-4 py-6">
+      <div className="relative bg-linear-to-br from-primary/80 to-primary px-4 py-6">
         <div className="flex items-center gap-2 text-primary-foreground">
           <MapPin className="h-4 w-4" />
           <span className="text-sm font-semibold">{slot.room}</span>
@@ -731,5 +759,271 @@ function SlotDetailPanel({
         ) : null}
       </div>
     </Card>
+  )
+}
+
+/* ---------- Slot Booking Page (inline) ---------- */
+
+interface BookingSlot {
+  id: number
+  date: string
+  time: string
+  room: string
+  currentGroups: number
+  maxGroups: number
+  reviewers: string[]
+  groups: { name: string; project: string }[]
+}
+
+const BOOKING_SLOTS: BookingSlot[] = [
+  { id: 1, date: '2026-03-30', time: '08:00 – 09:30', room: 'B4-101', currentGroups: 1, maxGroups: 3, reviewers: ['Lê Văn Dũng', 'Hoàng Minh Đức'], groups: [{ name: 'SE1701-G01', project: 'CapReview System' }] },
+  { id: 2, date: '2026-03-30', time: '09:30 – 11:00', room: 'B4-102', currentGroups: 3, maxGroups: 3, reviewers: ['Lê Văn Dũng'], groups: [{ name: 'SE1701-G02', project: 'E-Learning Platform' }, { name: 'SE1701-G03', project: 'Smart Parking' }, { name: 'SE1701-G04', project: 'Food Delivery App' }] },
+  { id: 3, date: '2026-03-30', time: '13:00 – 14:30', room: 'B4-103', currentGroups: 0, maxGroups: 3, reviewers: ['Hoàng Minh Đức', 'Nguyễn Thị Mai'], groups: [] },
+  { id: 4, date: '2026-03-31', time: '08:00 – 09:30', room: 'Online (Meet)', currentGroups: 2, maxGroups: 3, reviewers: ['Lê Văn Dũng'], groups: [{ name: 'SE1701-G05', project: 'HR Management' }, { name: 'SE1701-G06', project: 'Clinic Booking' }] },
+  { id: 5, date: '2026-03-31', time: '09:30 – 11:00', room: 'B4-201', currentGroups: 0, maxGroups: 3, reviewers: ['Nguyễn Thị Mai', 'Trần Quốc Bảo'], groups: [] },
+  { id: 6, date: '2026-04-01', time: '08:00 – 09:30', room: 'B4-202', currentGroups: 1, maxGroups: 3, reviewers: ['Trần Quốc Bảo'], groups: [{ name: 'SE1701-G07', project: 'Online Auction' }] },
+  { id: 7, date: '2026-04-01', time: '13:00 – 14:30', room: 'B4-101', currentGroups: 2, maxGroups: 3, reviewers: ['Lê Văn Dũng', 'Trần Quốc Bảo'], groups: [{ name: 'SE1701-G08', project: 'Blog CMS' }, { name: 'SE1701-G09', project: 'Inventory System' }] },
+  { id: 8, date: '2026-04-02', time: '09:30 – 11:00', room: 'B4-103', currentGroups: 3, maxGroups: 3, reviewers: ['Hoàng Minh Đức'], groups: [{ name: 'SE1701-G10', project: 'Travel Planner' }, { name: 'SE1701-G11', project: 'Quiz App' }, { name: 'SE1701-G12', project: 'Task Manager' }] },
+]
+
+const ALL_BOOKING_ROOMS = Array.from(new Set(BOOKING_SLOTS.map((s) => s.room))).sort()
+
+type BookingSlotState = 'available' | 'nearly-full' | 'full'
+
+function getBookingSlotState(slot: BookingSlot): BookingSlotState {
+  if (slot.currentGroups >= slot.maxGroups) return 'full'
+  if (slot.currentGroups >= slot.maxGroups - 1) return 'nearly-full'
+  return 'available'
+}
+
+function BookingStateBadge({ state }: { state: BookingSlotState }) {
+  if (state === 'full')
+    return <Badge variant="outline" className="border-destructive/30 bg-destructive/10 text-destructive gap-1"><XCircle className="size-3" /> Full</Badge>
+  if (state === 'nearly-full')
+    return <Badge variant="outline" className="border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400 gap-1"><AlertTriangle className="size-3" /> Nearly Full</Badge>
+  return <Badge variant="outline" className="border-green-600/30 bg-green-600/10 text-green-600 dark:text-green-400 gap-1"><CheckCircle2 className="size-3" /> Available</Badge>
+}
+
+function BookingOccupancyBar({ current, max }: { current: number; max: number }) {
+  const pct = max === 0 ? 0 : Math.round((current / max) * 100)
+  const color = pct >= 100 ? 'bg-destructive' : pct >= 67 ? 'bg-amber-500' : 'bg-green-500'
+  return (
+    <div className="flex items-center gap-2 min-w-20">
+      <div className="h-1.5 flex-1 rounded-full bg-muted overflow-hidden">
+        <div className={cn('h-full rounded-full transition-all', color)} style={{ width: `${pct}%` }} />
+      </div>
+      <span className="text-xs tabular-nums text-muted-foreground whitespace-nowrap">{current}/{max}</span>
+    </div>
+  )
+}
+
+function BookingExpandedDetail({ slot }: { slot: BookingSlot }) {
+  return (
+    <div className="px-4 py-3 bg-muted/30 border-t space-y-3">
+      <div className="flex flex-wrap gap-2 items-center">
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mr-1 flex items-center gap-1"><Users className="size-3.5" /> Reviewers</span>
+        {slot.reviewers.length === 0
+          ? <span className="text-xs text-muted-foreground italic">No reviewer assigned</span>
+          : slot.reviewers.map((r) => <Badge key={r} variant="secondary" className="text-xs">{r}</Badge>)
+        }
+      </div>
+      <div>
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1 mb-2"><BookOpen className="size-3.5" /> Registered Groups</span>
+        {slot.groups.length === 0
+          ? <p className="text-xs text-muted-foreground italic pl-1">No groups registered yet.</p>
+          : <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">{slot.groups.map((g) => (<div key={g.name} className="rounded-lg border bg-background px-3 py-2 text-xs"><p className="font-semibold">{g.name}</p><p className="text-muted-foreground truncate">{g.project}</p></div>))}</div>
+        }
+      </div>
+    </div>
+  )
+}
+
+export function SlotBookingPage() {
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date('2026-03-30'))
+  const [expandedId, setExpandedId] = useState<number | null>(null)
+  const [onlyAvailable, setOnlyAvailable] = useState(false)
+  const [roomFilter, setRoomFilter] = useState<string>('all')
+  const [registeredSlotId, setRegisteredSlotId] = useState<number | null>(1)
+
+  const dateStr = format(selectedDate, 'yyyy-MM-dd')
+
+  const filteredSlots = useMemo(() => {
+    return BOOKING_SLOTS.filter((s) => {
+      if (s.date !== dateStr) return false
+      if (onlyAvailable && getBookingSlotState(s) !== 'available') return false
+      if (roomFilter !== 'all' && s.room !== roomFilter) return false
+      return true
+    })
+  }, [dateStr, onlyAvailable, roomFilter])
+
+  const registeredSlot = registeredSlotId ? BOOKING_SLOTS.find((s) => s.id === registeredSlotId) ?? null : null
+
+  const slotDates = useMemo(() => BOOKING_SLOTS.map((s) => parseISO(s.date)), [])
+
+  function handleJoin(slot: BookingSlot) { setRegisteredSlotId(slot.id) }
+  function handleCancel() { setRegisteredSlotId(null) }
+  function toggleExpand(id: number) { setExpandedId((prev) => (prev === id ? null : id)) }
+
+  return (
+    <div className="space-y-4">
+      {/* Banner */}
+      {registeredSlot ? (
+        <Card className="border-primary/30 bg-primary/5">
+          <div className="py-3 px-4 flex flex-col sm:flex-row sm:items-center gap-3">
+            <CheckCircle2 className="size-5 text-primary shrink-0" />
+            <div className="flex-1 text-sm">
+              <p className="font-semibold text-primary">Bạn đã đăng ký slot</p>
+              <p className="text-muted-foreground">
+                <span className="font-medium text-foreground">{registeredSlot.time}</span>{' · '}
+                <span className="inline-flex items-center gap-1"><MapPin className="size-3" />{registeredSlot.room}</span>{' · '}
+                {format(parseISO(registeredSlot.date), 'dd MMM yyyy')}
+              </p>
+            </div>
+            <Button size="sm" variant="outline" className="text-destructive border-destructive/30 hover:bg-destructive/10" onClick={handleCancel}>
+              <XCircle className="size-4 mr-1" /> Hủy đăng ký
+            </Button>
+          </div>
+        </Card>
+      ) : (
+        <Card className="border-muted bg-muted/30">
+          <div className="py-3 px-4 flex items-center gap-3">
+            <CalendarDays className="size-5 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">Bạn chưa đăng ký slot nào.</p>
+          </div>
+        </Card>
+      )}
+
+      {/* 2-column layout */}
+      <div className="flex flex-col lg:flex-row gap-4 items-start">
+        {/* Mini Calendar */}
+        <Card className="w-full lg:w-auto shrink-0">
+          <div className="pb-1 pt-4 px-4">
+            <p className="text-sm font-semibold flex items-center gap-2"><CalendarDays className="size-4 text-primary" /> Chọn ngày</p>
+          </div>
+          <div className="p-2 pt-0">
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={(d: Date | undefined) => d && setSelectedDate(d)}
+              modifiers={{ hasSlot: slotDates }}
+              modifiersClassNames={{ hasSlot: 'after:absolute after:bottom-0.5 after:left-1/2 after:-translate-x-1/2 after:size-1 after:rounded-full after:bg-primary' }}
+              className="rounded-md"
+            />
+            <Separator className="my-2" />
+            <p className="text-xs text-center text-muted-foreground pb-1">Chấm = có slot</p>
+          </div>
+        </Card>
+
+        {/* Slot list */}
+        <div className="flex-1 min-w-0 space-y-3">
+          {/* Filters */}
+          <Card>
+            <div className="py-3 px-4 flex flex-wrap gap-4 items-center">
+              <div className="flex items-center gap-2">
+                <MapPin className="size-4 text-muted-foreground" />
+                <Select value={roomFilter} onValueChange={setRoomFilter}>
+                  <SelectTrigger className="h-8 w-40 text-sm"><SelectValue placeholder="Tất cả phòng" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tất cả phòng</SelectItem>
+                    {ALL_BOOKING_ROOMS.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <label className="flex items-center gap-2 cursor-pointer select-none text-sm">
+                <input type="checkbox" checked={onlyAvailable} onChange={(e) => setOnlyAvailable(e.target.checked)} className="size-4 accent-primary rounded" />
+                <span className="text-muted-foreground">Chỉ còn chỗ</span>
+              </label>
+              <span className="ml-auto text-sm font-medium text-muted-foreground">
+                {format(selectedDate, 'EEEE, dd MMM yyyy', { locale: vi })}
+              </span>
+            </div>
+          </Card>
+
+          {/* Table */}
+          <Card>
+            <div className="p-0">
+              {filteredSlots.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 text-muted-foreground gap-2">
+                  <CalendarDays className="size-8 opacity-40" />
+                  <p className="text-sm">Không có slot nào cho ngày / bộ lọc này.</p>
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead className="w-36"><span className="flex items-center gap-1"><Clock className="size-3.5" /> Giờ</span></TableHead>
+                      <TableHead><span className="flex items-center gap-1"><MapPin className="size-3.5" /> Phòng</span></TableHead>
+                      <TableHead className="w-32"><span className="flex items-center gap-1"><Users className="size-3.5" /> Nhóm</span></TableHead>
+                      <TableHead className="hidden md:table-cell">Reviewers</TableHead>
+                      <TableHead className="w-28">Trạng thái</TableHead>
+                      <TableHead className="w-28 text-right">Hành động</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredSlots.map((slot) => {
+                      const state = getBookingSlotState(slot)
+                      const isExpanded = expandedId === slot.id
+                      const isRegistered = registeredSlotId === slot.id
+                      return (
+                        <>
+                          <TableRow
+                            key={slot.id}
+                            className={cn('cursor-pointer transition-colors', isExpanded && 'bg-muted/40', isRegistered && 'bg-primary/5')}
+                            onClick={() => toggleExpand(slot.id)}
+                          >
+                            <TableCell className="font-medium text-sm">
+                              <div className="flex items-center gap-1.5">
+                                {isRegistered && <span className="size-2 rounded-full bg-primary shrink-0" />}
+                                {slot.time}
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-sm text-muted-foreground">{slot.room}</TableCell>
+                            <TableCell><BookingOccupancyBar current={slot.currentGroups} max={slot.maxGroups} /></TableCell>
+                            <TableCell className="hidden md:table-cell">
+                              <div className="flex flex-wrap gap-1">
+                                {slot.reviewers.slice(0, 2).map((r) => <Badge key={r} variant="secondary" className="text-xs">{r.split(' ').at(-1)}</Badge>)}
+                                {slot.reviewers.length > 2 && <Badge variant="secondary" className="text-xs">+{slot.reviewers.length - 2}</Badge>}
+                              </div>
+                            </TableCell>
+                            <TableCell><BookingStateBadge state={state} /></TableCell>
+                            <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                              <div className="flex items-center justify-end gap-1">
+                                {isRegistered ? (
+                                  <Button size="sm" variant="outline" className="h-7 text-xs text-destructive border-destructive/30 hover:bg-destructive/10" onClick={handleCancel}>Hủy</Button>
+                                ) : state === 'full' ? (
+                                  <Button size="sm" variant="outline" className="h-7 text-xs" disabled>Đầy</Button>
+                                ) : (
+                                  <Button size="sm" className={cn('h-7 text-xs', state === 'nearly-full' && 'bg-amber-500 hover:bg-amber-600 text-white border-amber-500')} onClick={() => handleJoin(slot)} disabled={!!registeredSlotId && registeredSlotId !== slot.id}>Đăng ký</Button>
+                                )}
+                                <Button size="icon" variant="ghost" className="size-7" onClick={(e) => { e.stopPropagation(); toggleExpand(slot.id) }}>
+                                  {isExpanded ? <ChevronLeft className="size-3.5 rotate-90" /> : <ChevronRight className="size-3.5 rotate-90" />}
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                          {isExpanded && (
+                            <TableRow key={`${slot.id}-detail`} className="hover:bg-transparent">
+                              <TableCell colSpan={6} className="p-0"><BookingExpandedDetail slot={slot} /></TableCell>
+                            </TableRow>
+                          )}
+                        </>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              )}
+            </div>
+          </Card>
+
+          {/* Legend */}
+          <div className="flex flex-wrap gap-4 text-xs text-muted-foreground px-1">
+            <span className="flex items-center gap-1.5"><span className="size-2 rounded-full bg-green-500" /> Còn chỗ</span>
+            <span className="flex items-center gap-1.5"><span className="size-2 rounded-full bg-amber-500" /> Gần đầy</span>
+            <span className="flex items-center gap-1.5"><span className="size-2 rounded-full bg-destructive" /> Đầy</span>
+            <span className="flex items-center gap-1.5"><span className="size-2 rounded-full bg-primary" /> Slot của bạn</span>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }

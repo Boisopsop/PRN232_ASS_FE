@@ -4,7 +4,7 @@
 import type { LucideIcon } from 'lucide-react'
 
 import type { UserRole } from '@/types'
-import { CalendarPlus, Calendar, LayoutDashboard, RefreshCw, Clock, Settings, Bell } from 'lucide-react'
+import { Calendar, LayoutDashboard, RefreshCw, Clock, Settings, Bell } from 'lucide-react'
 
 export type NavLinkItem = {
   to: string
@@ -23,8 +23,7 @@ export function getNavLinks(role: UserRole): NavLinkItem[] {
   if (role === 'GV_REVIEW') {
     return [
       { to: '/reviewer/dashboard', label: 'Tổng quan', Icon: LayoutDashboard },
-      { to: '/reviewer/register', label: 'Đăng ký Slot', Icon: CalendarPlus },
-      { to: '/reviewer/schedule', label: 'Lịch của tôi', Icon: Calendar },
+      { to: '/reviewer/calendar', label: 'Lịch đăng ký', Icon: Calendar },
     ]
   }
 

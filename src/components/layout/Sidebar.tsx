@@ -84,7 +84,7 @@ export function Sidebar() {
           <NavLink
             key={item.to}
             to={item.to}
-            end={item.to !== '/reviewer/register'}
+            end={item.to !== '/reviewer/calendar'}
             onClick={() => setSidebarOpen(false)}
             aria-label={`Đi tới ${item.label}`}
             className={({ isActive }) =>
@@ -131,11 +131,11 @@ export function Sidebar() {
 
   return (
     <>
-      <aside className="hidden h-screen w-[240px] bg-sidebar md:block">
+      <aside className="hidden h-screen w-60 bg-sidebar md:block">
         {sidebarContent}
       </aside>
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-        <SheetContent side="left" className="w-[240px] border-r-0 p-0 md:hidden" showCloseButton>
+        <SheetContent side="left" className="w-60 border-r-0 p-0 md:hidden" showCloseButton>
           {sidebarContent}
         </SheetContent>
       </Sheet>

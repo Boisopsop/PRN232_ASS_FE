@@ -135,7 +135,7 @@ export function ReviewerDashboard() {
 
   return (
     <div className="space-y-5">
-      <Card className="rounded-2xl bg-gradient-to-r from-primary via-primary/90 to-primary/70 p-6 text-primary-foreground shadow-sm">
+      <Card className="rounded-2xl bg-linear-to-r from-primary via-primary/90 to-primary/70 p-6 text-primary-foreground shadow-sm">
         <h1 className="font-sora text-2xl font-bold">Xin chào, GV {currentUser.full_name}</h1>
         <div className="mt-3">
           <Badge className="rounded-lg border-primary-foreground/25 bg-card/10 text-primary-foreground" variant="outline">
@@ -172,7 +172,7 @@ export function ReviewerDashboard() {
               <button
                 type="button"
                 className="mt-2 text-sm font-semibold text-primary transition-all duration-150 hover:text-primary"
-                onClick={() => navigate('/reviewer/register')}
+                onClick={() => navigate('/reviewer/calendar')}
               >
                 Đăng ký thêm →
               </button>

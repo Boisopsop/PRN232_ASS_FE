@@ -69,7 +69,7 @@ export function UserAvatarDropdown() {
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuItem
           onSelect={() => logout()}
-          className="text-red-600 data-[disabled]:text-red-600"
+          className="text-red-600 data-disabled:text-red-600"
         >
           <LogOut className="mr-2 h-4 w-4" />
           Đăng xuất

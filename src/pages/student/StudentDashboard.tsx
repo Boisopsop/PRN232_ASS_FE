@@ -126,7 +126,7 @@ export function StudentDashboard() {
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.35 }}
-        className="rounded-2xl bg-gradient-to-r from-primary via-primary/90 to-primary/70 p-6 text-primary-foreground shadow-sm"
+        className="rounded-2xl bg-linear-to-r from-primary via-primary/90 to-primary/70 p-6 text-primary-foreground shadow-sm"
       >
         <h1 className="font-sora text-2xl font-bold">Xin chào, {currentUser.full_name}! 👋</h1>
         <p className="mt-2 text-sm text-primary-foreground/90">

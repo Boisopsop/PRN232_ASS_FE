@@ -15,8 +15,7 @@ import { LoginPage } from '@/pages/auth/LoginPage'
 import { StudentDashboard } from '@/pages/student/StudentDashboard'
 import { StudentCalendar } from '@/pages/student/StudentCalendar'
 import { ReviewerDashboard } from '@/pages/reviewer/ReviewerDashboard'
-import { ReviewerSlotRegistration } from '@/pages/reviewer/ReviewerSlotRegistration'
-import { MySchedule as ReviewerMySchedule } from '@/pages/reviewer/MySchedule'
+import { ReviewerCalendar } from '@/pages/reviewer/ReviewerCalendar'
 import { ModeratorDashboard } from '@/pages/moderator/ModeratorDashboard'
 import { ManageRounds } from '@/pages/moderator/ManageRounds'
 import { ManageSlots } from '@/pages/moderator/ManageSlots'
@@ -72,18 +71,10 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'reviewer/register',
+        path: 'reviewer/calendar',
         element: (
           <ProtectedRoute roleGroup="reviewer">
-            <ReviewerSlotRegistration />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: 'reviewer/schedule',
-        element: (
-          <ProtectedRoute roleGroup="reviewer">
-            <ReviewerMySchedule />
+            <ReviewerCalendar />
           </ProtectedRoute>
         ),
       },
