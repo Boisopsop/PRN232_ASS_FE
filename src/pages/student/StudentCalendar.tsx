@@ -765,35 +765,12 @@ function SlotDetailPanel({
 
 /* ---------- Slot Booking Page (inline) ---------- */
 
-interface BookingSlot {
-  id: number
-  date: string
-  time: string
-  room: string
-  currentGroups: number
-  maxGroups: number
-  reviewers: string[]
-  groups: { name: string; project: string }[]
-}
+type BookingSlotState = 'available' | 'nearly-full' | 'full' | 'locked'
 
-const BOOKING_SLOTS: BookingSlot[] = [
-  { id: 1, date: '2026-03-30', time: '08:00 – 09:30', room: 'B4-101', currentGroups: 1, maxGroups: 3, reviewers: ['Lê Văn Dũng', 'Hoàng Minh Đức'], groups: [{ name: 'SE1701-G01', project: 'CapReview System' }] },
-  { id: 2, date: '2026-03-30', time: '09:30 – 11:00', room: 'B4-102', currentGroups: 3, maxGroups: 3, reviewers: ['Lê Văn Dũng'], groups: [{ name: 'SE1701-G02', project: 'E-Learning Platform' }, { name: 'SE1701-G03', project: 'Smart Parking' }, { name: 'SE1701-G04', project: 'Food Delivery App' }] },
-  { id: 3, date: '2026-03-30', time: '13:00 – 14:30', room: 'B4-103', currentGroups: 0, maxGroups: 3, reviewers: ['Hoàng Minh Đức', 'Nguyễn Thị Mai'], groups: [] },
-  { id: 4, date: '2026-03-31', time: '08:00 – 09:30', room: 'Online (Meet)', currentGroups: 2, maxGroups: 3, reviewers: ['Lê Văn Dũng'], groups: [{ name: 'SE1701-G05', project: 'HR Management' }, { name: 'SE1701-G06', project: 'Clinic Booking' }] },
-  { id: 5, date: '2026-03-31', time: '09:30 – 11:00', room: 'B4-201', currentGroups: 0, maxGroups: 3, reviewers: ['Nguyễn Thị Mai', 'Trần Quốc Bảo'], groups: [] },
-  { id: 6, date: '2026-04-01', time: '08:00 – 09:30', room: 'B4-202', currentGroups: 1, maxGroups: 3, reviewers: ['Trần Quốc Bảo'], groups: [{ name: 'SE1701-G07', project: 'Online Auction' }] },
-  { id: 7, date: '2026-04-01', time: '13:00 – 14:30', room: 'B4-101', currentGroups: 2, maxGroups: 3, reviewers: ['Lê Văn Dũng', 'Trần Quốc Bảo'], groups: [{ name: 'SE1701-G08', project: 'Blog CMS' }, { name: 'SE1701-G09', project: 'Inventory System' }] },
-  { id: 8, date: '2026-04-02', time: '09:30 – 11:00', room: 'B4-103', currentGroups: 3, maxGroups: 3, reviewers: ['Hoàng Minh Đức'], groups: [{ name: 'SE1701-G10', project: 'Travel Planner' }, { name: 'SE1701-G11', project: 'Quiz App' }, { name: 'SE1701-G12', project: 'Task Manager' }] },
-]
-
-const ALL_BOOKING_ROOMS = Array.from(new Set(BOOKING_SLOTS.map((s) => s.room))).sort()
-
-type BookingSlotState = 'available' | 'nearly-full' | 'full'
-
-function getBookingSlotState(slot: BookingSlot): BookingSlotState {
-  if (slot.currentGroups >= slot.maxGroups) return 'full'
-  if (slot.currentGroups >= slot.maxGroups - 1) return 'nearly-full'
+function getSlotState(slot: SlotWithDetails): BookingSlotState {
+  if (slot.status === 'LOCKED' || slot.status === 'CANCELLED') return 'locked'
+  if (slot.status === 'FULL' || slot.current_group_count >= slot.max_groups) return 'full'
+  if (slot.current_group_count >= slot.max_groups - 1) return 'nearly-full'
   return 'available'
 }
 
@@ -801,7 +778,9 @@ function BookingStateBadge({ state }: { state: BookingSlotState }) {
   if (state === 'full')
     return <Badge variant="outline" className="border-destructive/30 bg-destructive/10 text-destructive gap-1"><XCircle className="size-3" /> Full</Badge>
   if (state === 'nearly-full')
-    return <Badge variant="outline" className="border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400 gap-1"><AlertTriangle className="size-3" /> Nearly Full</Badge>
+    return <Badge variant="outline" className="border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400 gap-1"><AlertTriangle className="size-3" /> Gần đầy</Badge>
+  if (state === 'locked')
+    return <Badge variant="outline" className="border-muted-foreground/30 bg-muted text-muted-foreground gap-1">Đã khóa</Badge>
   return <Badge variant="outline" className="border-green-600/30 bg-green-600/10 text-green-600 dark:text-green-400 gap-1"><CheckCircle2 className="size-3" /> Available</Badge>
 }
 
@@ -818,52 +797,107 @@ function BookingOccupancyBar({ current, max }: { current: number; max: number })
   )
 }
 
-function BookingExpandedDetail({ slot }: { slot: BookingSlot }) {
-  return (
-    <div className="px-4 py-3 bg-muted/30 border-t space-y-3">
-      <div className="flex flex-wrap gap-2 items-center">
-        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mr-1 flex items-center gap-1"><Users className="size-3.5" /> Reviewers</span>
-        {slot.reviewers.length === 0
-          ? <span className="text-xs text-muted-foreground italic">No reviewer assigned</span>
-          : slot.reviewers.map((r) => <Badge key={r} variant="secondary" className="text-xs">{r}</Badge>)
-        }
-      </div>
-      <div>
-        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1 mb-2"><BookOpen className="size-3.5" /> Registered Groups</span>
-        {slot.groups.length === 0
-          ? <p className="text-xs text-muted-foreground italic pl-1">No groups registered yet.</p>
-          : <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">{slot.groups.map((g) => (<div key={g.name} className="rounded-lg border bg-background px-3 py-2 text-xs"><p className="font-semibold">{g.name}</p><p className="text-muted-foreground truncate">{g.project}</p></div>))}</div>
-        }
-      </div>
-    </div>
-  )
-}
-
 export function SlotBookingPage() {
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date('2026-03-30'))
-  const [expandedId, setExpandedId] = useState<number | null>(null)
+  const { currentUser } = useAuthStore()
+
+  const activeSemesterQuery = useActiveSemester()
+  const activeSemester = activeSemesterQuery.data ?? null
+  const roundsQuery = useRounds(activeSemester?.semester_id ?? 0)
+  const rounds = roundsQuery.data ?? []
+
+  const firstOpenRoundId = useMemo(
+    () => rounds.find((r) => r.status === 'OPEN')?.round_id ?? 0,
+    [rounds],
+  )
+  const [selectedRoundId, setSelectedRoundId] = useState(0)
+
+  useEffect(() => {
+    if (selectedRoundId > 0) return
+    if (firstOpenRoundId > 0) { setSelectedRoundId(firstOpenRoundId); return }
+    if (rounds.length > 0) setSelectedRoundId(rounds[0].round_id)
+  }, [firstOpenRoundId, rounds, selectedRoundId])
+
+  const activeRound = useMemo(
+    () => rounds.find((r) => r.round_id === selectedRoundId) ?? null,
+    [rounds, selectedRoundId],
+  )
+
+  const slotsQuery = useSlotsForRound(selectedRoundId)
+  const slots = slotsQuery.data ?? []
+
+  const studentGroupQuery = useStudentGroup(currentUser?.user_id ?? 0)
+  const group = studentGroupQuery.data?.group ?? null
+
+  const groupRegsQuery = useGroupRegistrations(group?.group_id ?? 0)
+  const groupRegistration = useMemo(() => {
+    if (!group || !activeRound) return null
+    const regs = groupRegsQuery.data ?? []
+    return (
+      regs.find((r) => {
+        if (r.status !== 'REGISTERED') return false
+        const slot = slots.find((s) => s.slot_id === r.slot_id)
+        return slot ? slot.round_id === activeRound.round_id : false
+      }) ?? null
+    )
+  }, [group, activeRound, groupRegsQuery.data, slots])
+
+  const registeredSlot = useMemo(
+    () => slots.find((s) => s.slot_id === groupRegistration?.slot_id) ?? null,
+    [slots, groupRegistration],
+  )
+
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const [onlyAvailable, setOnlyAvailable] = useState(false)
   const [roomFilter, setRoomFilter] = useState<string>('all')
-  const [registeredSlotId, setRegisteredSlotId] = useState<number | null>(1)
+  const [expandedId, setExpandedId] = useState<number | null>(null)
+  const [registerDialog, setRegisterDialog] = useState<{ slot_id: number } | null>(null)
+  const [cancelDialog, setCancelDialog] = useState<{ registration_id: number } | null>(null)
+
+  const registerMutation = useRegisterGroupSlot()
+  const cancelMutation = useCancelGroupRegistration()
 
   const dateStr = format(selectedDate, 'yyyy-MM-dd')
+  const allRooms = useMemo(() => Array.from(new Set(slots.map((s) => s.room))).sort(), [slots])
+  const slotDates = useMemo(() => slots.map((s) => parseISO(s.start_time)), [slots])
 
   const filteredSlots = useMemo(() => {
-    return BOOKING_SLOTS.filter((s) => {
-      if (s.date !== dateStr) return false
-      if (onlyAvailable && getBookingSlotState(s) !== 'available') return false
+    return slots.filter((s) => {
+      const slotDate = format(parseISO(s.start_time), 'yyyy-MM-dd')
+      if (slotDate !== dateStr) return false
+      const state = getSlotState(s)
+      if (onlyAvailable && state !== 'available' && state !== 'nearly-full') return false
       if (roomFilter !== 'all' && s.room !== roomFilter) return false
       return true
     })
-  }, [dateStr, onlyAvailable, roomFilter])
+  }, [slots, dateStr, onlyAvailable, roomFilter])
 
-  const registeredSlot = registeredSlotId ? BOOKING_SLOTS.find((s) => s.id === registeredSlotId) ?? null : null
-
-  const slotDates = useMemo(() => BOOKING_SLOTS.map((s) => parseISO(s.date)), [])
-
-  function handleJoin(slot: BookingSlot) { setRegisteredSlotId(slot.id) }
-  function handleCancel() { setRegisteredSlotId(null) }
   function toggleExpand(id: number) { setExpandedId((prev) => (prev === id ? null : id)) }
+
+  const onConfirmRegister = async () => {
+    if (!group || !currentUser || !registerDialog) return
+    try {
+      await registerMutation.mutateAsync({
+        group_id: group.group_id,
+        slot_id: registerDialog.slot_id,
+        registered_by: currentUser.user_id,
+      })
+      setRegisterDialog(null)
+    } catch {
+      // handled by hook
+    }
+  }
+
+  const onConfirmCancel = async () => {
+    if (!cancelDialog) return
+    try {
+      await cancelMutation.mutateAsync({ registration_id: cancelDialog.registration_id })
+      setCancelDialog(null)
+    } catch {
+      // handled by hook
+    }
+  }
+
+  const isRoundOpen = activeRound?.status === 'OPEN'
 
   return (
     <div className="space-y-4">
@@ -875,14 +909,16 @@ export function SlotBookingPage() {
             <div className="flex-1 text-sm">
               <p className="font-semibold text-primary">Bạn đã đăng ký slot</p>
               <p className="text-muted-foreground">
-                <span className="font-medium text-foreground">{registeredSlot.time}</span>{' · '}
+                <span className="font-medium text-foreground">{fmtTime(registeredSlot.start_time)} – {fmtTime(registeredSlot.end_time)}</span>{' · '}
                 <span className="inline-flex items-center gap-1"><MapPin className="size-3" />{registeredSlot.room}</span>{' · '}
-                {format(parseISO(registeredSlot.date), 'dd MMM yyyy')}
+                {fmtDate(registeredSlot.start_time)}
               </p>
             </div>
-            <Button size="sm" variant="outline" className="text-destructive border-destructive/30 hover:bg-destructive/10" onClick={handleCancel}>
-              <XCircle className="size-4 mr-1" /> Hủy đăng ký
-            </Button>
+            {isRoundOpen && groupRegistration ? (
+              <Button size="sm" variant="outline" className="text-destructive border-destructive/30 hover:bg-destructive/10" onClick={() => setCancelDialog({ registration_id: groupRegistration.registration_id })}>
+                <XCircle className="size-4 mr-1" /> Hủy đăng ký
+              </Button>
+            ) : null}
           </div>
         </Card>
       ) : (
@@ -926,7 +962,7 @@ export function SlotBookingPage() {
                   <SelectTrigger className="h-8 w-40 text-sm"><SelectValue placeholder="Tất cả phòng" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Tất cả phòng</SelectItem>
-                    {ALL_BOOKING_ROOMS.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
+                    {allRooms.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
@@ -943,7 +979,11 @@ export function SlotBookingPage() {
           {/* Table */}
           <Card>
             <div className="p-0">
-              {filteredSlots.length === 0 ? (
+              {slotsQuery.isLoading ? (
+                <div className="flex items-center justify-center py-16 text-muted-foreground">
+                  <span className="text-sm">Đang tải slot...</span>
+                </div>
+              ) : filteredSlots.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 text-muted-foreground gap-2">
                   <CalendarDays className="size-8 opacity-40" />
                   <p className="text-sm">Không có slot nào cho ngày / bộ lọc này.</p>
@@ -962,49 +1002,90 @@ export function SlotBookingPage() {
                   </TableHeader>
                   <TableBody>
                     {filteredSlots.map((slot) => {
-                      const state = getBookingSlotState(slot)
-                      const isExpanded = expandedId === slot.id
-                      const isRegistered = registeredSlotId === slot.id
+                      const state = getSlotState(slot)
+                      const isExpanded = expandedId === slot.slot_id
+                      const isRegistered = groupRegistration?.slot_id === slot.slot_id
+                      const canBook = isRoundOpen && !groupRegistration && (state === 'available' || state === 'nearly-full')
                       return (
                         <>
                           <TableRow
-                            key={slot.id}
+                            key={slot.slot_id}
                             className={cn('cursor-pointer transition-colors', isExpanded && 'bg-muted/40', isRegistered && 'bg-primary/5')}
-                            onClick={() => toggleExpand(slot.id)}
+                            onClick={() => toggleExpand(slot.slot_id)}
                           >
                             <TableCell className="font-medium text-sm">
                               <div className="flex items-center gap-1.5">
                                 {isRegistered && <span className="size-2 rounded-full bg-primary shrink-0" />}
-                                {slot.time}
+                                {fmtTime(slot.start_time)} – {fmtTime(slot.end_time)}
                               </div>
                             </TableCell>
                             <TableCell className="text-sm text-muted-foreground">{slot.room}</TableCell>
-                            <TableCell><BookingOccupancyBar current={slot.currentGroups} max={slot.maxGroups} /></TableCell>
+                            <TableCell><BookingOccupancyBar current={slot.current_group_count} max={slot.max_groups} /></TableCell>
                             <TableCell className="hidden md:table-cell">
                               <div className="flex flex-wrap gap-1">
-                                {slot.reviewers.slice(0, 2).map((r) => <Badge key={r} variant="secondary" className="text-xs">{r.split(' ').at(-1)}</Badge>)}
-                                {slot.reviewers.length > 2 && <Badge variant="secondary" className="text-xs">+{slot.reviewers.length - 2}</Badge>}
+                                {slot.registered_reviewers.slice(0, 2).map((r) => (
+                                  <Badge key={r.user_id} variant="secondary" className="text-xs">{r.full_name.split(' ').at(-1)}</Badge>
+                                ))}
+                                {slot.registered_reviewers.length > 2 && (
+                                  <Badge variant="secondary" className="text-xs">+{slot.registered_reviewers.length - 2}</Badge>
+                                )}
                               </div>
                             </TableCell>
                             <TableCell><BookingStateBadge state={state} /></TableCell>
                             <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                               <div className="flex items-center justify-end gap-1">
                                 {isRegistered ? (
-                                  <Button size="sm" variant="outline" className="h-7 text-xs text-destructive border-destructive/30 hover:bg-destructive/10" onClick={handleCancel}>Hủy</Button>
-                                ) : state === 'full' ? (
-                                  <Button size="sm" variant="outline" className="h-7 text-xs" disabled>Đầy</Button>
+                                  isRoundOpen ? (
+                                    <Button size="sm" variant="outline" className="h-7 text-xs text-destructive border-destructive/30 hover:bg-destructive/10" onClick={() => setCancelDialog({ registration_id: groupRegistration!.registration_id })}>Hủy</Button>
+                                  ) : (
+                                    <Badge variant="secondary" className="text-xs">Đã đăng ký</Badge>
+                                  )
+                                ) : canBook ? (
+                                  <Button
+                                    size="sm"
+                                    className={cn('h-7 text-xs', state === 'nearly-full' && 'bg-amber-500 hover:bg-amber-600 text-white border-amber-500')}
+                                    onClick={() => setRegisterDialog({ slot_id: slot.slot_id })}
+                                  >
+                                    Đăng ký
+                                  </Button>
                                 ) : (
-                                  <Button size="sm" className={cn('h-7 text-xs', state === 'nearly-full' && 'bg-amber-500 hover:bg-amber-600 text-white border-amber-500')} onClick={() => handleJoin(slot)} disabled={!!registeredSlotId && registeredSlotId !== slot.id}>Đăng ký</Button>
+                                  <Button size="sm" variant="outline" className="h-7 text-xs" disabled>
+                                    {state === 'full' ? 'Đầy' : state === 'locked' ? 'Khóa' : '—'}
+                                  </Button>
                                 )}
-                                <Button size="icon" variant="ghost" className="size-7" onClick={(e) => { e.stopPropagation(); toggleExpand(slot.id) }}>
+                                <Button size="icon" variant="ghost" className="size-7" onClick={(e) => { e.stopPropagation(); toggleExpand(slot.slot_id) }}>
                                   {isExpanded ? <ChevronLeft className="size-3.5 rotate-90" /> : <ChevronRight className="size-3.5 rotate-90" />}
                                 </Button>
                               </div>
                             </TableCell>
                           </TableRow>
                           {isExpanded && (
-                            <TableRow key={`${slot.id}-detail`} className="hover:bg-transparent">
-                              <TableCell colSpan={6} className="p-0"><BookingExpandedDetail slot={slot} /></TableCell>
+                            <TableRow key={`${slot.slot_id}-detail`} className="hover:bg-transparent">
+                              <TableCell colSpan={6} className="p-0">
+                                <div className="px-4 py-3 bg-muted/30 border-t space-y-3">
+                                  <div className="flex flex-wrap gap-2 items-center">
+                                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mr-1 flex items-center gap-1"><Users className="size-3.5" /> Reviewers</span>
+                                    {slot.registered_reviewers.length === 0
+                                      ? <span className="text-xs text-muted-foreground italic">Chưa có reviewer</span>
+                                      : slot.registered_reviewers.map((r) => <Badge key={r.user_id} variant="secondary" className="text-xs">{r.full_name}</Badge>)
+                                    }
+                                  </div>
+                                  <div>
+                                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1 mb-2"><BookOpen className="size-3.5" /> Nhóm đã đăng ký</span>
+                                    {slot.registered_groups.length === 0
+                                      ? <p className="text-xs text-muted-foreground italic pl-1">Chưa có nhóm đăng ký.</p>
+                                      : <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                                          {slot.registered_groups.map((g) => (
+                                            <div key={g.group_id} className="rounded-lg border bg-background px-3 py-2 text-xs">
+                                              <p className="font-semibold">{g.group_name}</p>
+                                              <p className="text-muted-foreground truncate">{g.project_title}</p>
+                                            </div>
+                                          ))}
+                                        </div>
+                                    }
+                                  </div>
+                                </div>
+                              </TableCell>
                             </TableRow>
                           )}
                         </>
@@ -1025,6 +1106,26 @@ export function SlotBookingPage() {
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={!!registerDialog}
+        onClose={() => setRegisterDialog(null)}
+        title="Xác nhận đăng ký slot?"
+        description="Nhóm bạn sẽ được đăng ký slot này. Bạn có thể hủy trước khi round đóng."
+        confirmLabel="Đăng ký"
+        onConfirm={onConfirmRegister}
+        isLoading={registerMutation.isPending}
+      />
+      <ConfirmDialog
+        isOpen={!!cancelDialog}
+        onClose={() => setCancelDialog(null)}
+        title="Hủy đăng ký slot?"
+        description="Nhóm bạn sẽ mất vị trí trong slot này."
+        confirmLabel="Hủy đăng ký"
+        confirmVariant="destructive"
+        onConfirm={onConfirmCancel}
+        isLoading={cancelMutation.isPending}
+      />
     </div>
   )
 }

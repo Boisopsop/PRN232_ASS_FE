@@ -132,9 +132,9 @@ export function StudentDashboard() {
       <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <StatsCard
           title="Lần đã đăng ký"
-          value={groupRegistrations.length}
+          value={groupRegistrations.filter((r) => r.status === 'REGISTERED').length}
           icon={ClipboardCheck}
-          subtitle="Tổng số lượt đăng ký của nhóm"
+          subtitle="Số slot đang đăng ký (chưa huỷ)"
         />
         <StatsCard
           title="Round đang mở"

@@ -151,9 +151,14 @@ export async function getUserById(userId: number): Promise<User> {
 // SEMESTERS
 // ====================================================================
 
-export async function getActiveSemester(): Promise<Semester> {
-  const { data } = await apiClient.get<SemesterDto>('/Semesters/active')
-  return mapSemester(data)
+export async function getActiveSemester(): Promise<Semester | null> {
+  try {
+    const { data } = await apiClient.get<SemesterDto>('/Semesters/active')
+    return mapSemester(data)
+  } catch {
+    // 404 = chưa có semester active → trả null
+    return null
+  }
 }
 
 export async function getSemesters(pageSize = 100, pageNumber = 1): Promise<Semester[]> {
@@ -198,10 +203,19 @@ export async function deleteSemester(semester_id: number): Promise<void> {
 // ====================================================================
 
 export async function getRoundsForSemester(semester_id: number): Promise<ReviewRound[]> {
-  const { data } = await apiClient.get<ReviewRoundDto[]>(
-    `/ReviewRounds/semester/${semester_id}`,
-  )
-  return data.map(mapRound)
+  try {
+    // Thử endpoint semester-specific trước
+    const { data } = await apiClient.get<ReviewRoundDto[]>(
+      `/ReviewRounds/semester/${semester_id}`,
+    )
+    return data.map(mapRound)
+  } catch {
+    // Fallback: lấy tất cả rounds rồi filter theo semesterId
+    const { data } = await apiClient.get<ReviewRoundDto[]>('/ReviewRounds', {
+      params: { pageSize: 100 },
+    })
+    return data.filter((r) => r.semesterId === semester_id).map(mapRound)
+  }
 }
 
 export async function getOpenRounds(): Promise<ReviewRound[]> {
@@ -623,12 +637,25 @@ export async function getGroupMemberByStudent(
   studentId: number,
 ): Promise<GroupMember | null> {
   try {
-    const { data } = await apiClient.get<GroupMemberDto>(
+    // BE có thể trả array hoặc single object
+    const { data } = await apiClient.get<GroupMemberDto | GroupMemberDto[]>(
       `/GroupMembers/student/${studentId}`,
     )
-    return mapGroupMember(data)
+    // Nếu trả array → lấy phần tử đầu
+    const dto = Array.isArray(data) ? data[0] : data
+    if (!dto || !dto.groupId) return null
+    return mapGroupMember(dto)
   } catch {
-    return null
+    try {
+      // Fallback: lấy tất cả members rồi tìm theo studentId
+      const { data } = await apiClient.get<GroupMemberDto[]>('/GroupMembers', {
+        params: { pageSize: 500 },
+      })
+      const found = data.find((m) => m.studentId === studentId)
+      return found ? mapGroupMember(found) : null
+    } catch {
+      return null
+    }
   }
 }
 

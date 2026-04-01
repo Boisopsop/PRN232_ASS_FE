@@ -276,7 +276,8 @@ export function mapGroupRegistration(dto: GroupSlotRegistrationDto): GroupSlotRe
     slot_id: dto.slotId,
     registered_by: dto.registeredBy,
     registered_at: dto.registeredAt,
-    status: beToFeRegStatus[dto.status] ?? 'REGISTERED',
+    // Fallback 'CANCELLED' an toàn hơn 'REGISTERED' khi BE trả status không xác định
+    status: beToFeRegStatus[dto.status] ?? 'CANCELLED',
   }
 }
 
@@ -286,7 +287,7 @@ export function mapReviewerRegistration(dto: ReviewerSlotRegistrationDto): Revie
     reviewer_id: dto.reviewerId,
     slot_id: dto.slotId,
     registered_at: dto.registeredAt,
-    status: beToFeRegStatus[dto.status] ?? 'REGISTERED',
+    status: beToFeRegStatus[dto.status] ?? 'CANCELLED',
   }
 }
 

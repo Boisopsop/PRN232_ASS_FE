@@ -13,7 +13,7 @@ interface UiState {
 
 export const useUiStore = create<UiState>()((set) => ({
   sidebarOpen: false,
-  activeRoundId: 1,
+  activeRoundId: 0,
   toggleSidebar: () =>
     set((state) => ({
       sidebarOpen: !state.sidebarOpen,
