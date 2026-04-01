@@ -51,8 +51,9 @@ import { SlotCard } from '@/components/shared/SlotCard'
 import { SlotCardSkeleton } from '@/components/shared/LoadingSkeletons'
 import { useRounds } from '@/hooks/useRounds'
 import { useSlotsForRound } from '@/hooks/useSlots'
-import { useRegisterReviewerSlot, useCancelReviewerRegistration } from '@/hooks/useReviewer'
-import { mockDb, mockSemesters } from '@/lib/mock'
+import { useRegisterReviewerSlot, useCancelReviewerRegistration, useReviewerStats } from '@/hooks/useReviewer'
+import { useReviewerRegistrations } from '@/hooks/useReviewerRegistrations'
+import { useActiveSemester } from '@/hooks/useActiveSemester'
 import { useAuthStore } from '@/stores/authStore'
 import { cn } from '@/lib/utils'
 import type { ReviewRound, SlotWithDetails } from '@/types'
@@ -82,10 +83,12 @@ const WEEKDAY_LABELS = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
 
 export function ReviewerCalendar() {
   const { currentUser } = useAuthStore()
-  const roundsQuery = useRounds(1)
-  const rounds = roundsQuery.data ?? []
 
-  const activeSemester = useMemo(() => mockSemesters.find((s) => s.is_active) ?? null, [])
+  const activeSemesterQuery = useActiveSemester()
+  const activeSemester = activeSemesterQuery.data ?? null
+
+  const roundsQuery = useRounds(activeSemester?.semester_id ?? 0)
+  const rounds = roundsQuery.data ?? []
 
   // Round selection
   const firstOpenRoundId = useMemo(
@@ -115,20 +118,21 @@ export function ReviewerCalendar() {
   const cancelMutation = useCancelReviewerRegistration()
 
   // Config for max slots
-  const config = useMemo(() => mockDb.configs.find((c) => c.round_id === selectedRoundId) ?? null, [selectedRoundId])
+  const reviewerStats = useReviewerStats(currentUser?.user_id ?? 0, selectedRoundId)
 
   // Reviewer registrations in this round
+  const reviewerRegsQuery = useReviewerRegistrations(currentUser?.user_id ?? 0)
   const reviewerRegistrationsInRound = useMemo(() => {
     if (!currentUser) return []
-    return mockDb.reviewerRegistrations.filter((r) => {
-      if (r.reviewer_id !== currentUser.user_id || r.status !== 'REGISTERED') return false
-      const slot = mockDb.slots.find((s) => s.slot_id === r.slot_id)
+    const regs = reviewerRegsQuery.data ?? []
+    return regs.filter((r) => {
+      if (r.status !== 'REGISTERED') return false
+      const slot = slots.find((s) => s.slot_id === r.slot_id)
       return slot ? slot.round_id === selectedRoundId : false
     })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser, selectedRoundId, registerMutation.isSuccess, cancelMutation.isSuccess])
+  }, [currentUser, selectedRoundId, reviewerRegsQuery.data, slots])
 
-  const maxSlots = config?.max_slots ?? 0
+  const maxSlots = reviewerStats.maxAllowed
   const isAtMax = maxSlots > 0 && reviewerRegistrationsInRound.length >= maxSlots
 
   // Calendar month state
@@ -327,7 +331,7 @@ export function ReviewerCalendar() {
               </div>
               <div className="mt-2 space-y-1">
                 {reviewerRegistrationsInRound.map((reg) => {
-                  const slot = mockDb.slots.find((s) => s.slot_id === reg.slot_id)
+                  const slot = slots.find((s) => s.slot_id === reg.slot_id)
                   if (!slot) return null
                   return (
                     <div key={reg.reviewer_registration_id} className="text-sm text-green-600 dark:text-green-400">
@@ -484,7 +488,7 @@ export function ReviewerCalendar() {
               </div>
               <div className="mt-2 space-y-1">
                 {reviewerRegistrationsInRound.map((reg) => {
-                  const slot = mockDb.slots.find((s) => s.slot_id === reg.slot_id)
+                  const slot = slots.find((s) => s.slot_id === reg.slot_id)
                   if (!slot) return null
                   return (
                     <div key={reg.reviewer_registration_id} className="text-sm text-green-600 dark:text-green-400">

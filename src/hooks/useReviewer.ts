@@ -11,7 +11,7 @@ import {
   getReviewerConfig,
   getSlotsForRound,
   registerReviewerSlot,
-} from '@/lib/mock/api'
+} from '@/lib/api'
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message

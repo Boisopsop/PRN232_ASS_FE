@@ -24,8 +24,10 @@ import { StatsCard } from '@/components/shared/StatsCard'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { useModeratorDashboard } from '@/hooks/useDashboard'
 import { useRounds } from '@/hooks/useRounds'
-import { mockGroupMembers, mockSemesters, mockUsers } from '@/lib/mock'
-import { sendReminder } from '@/lib/mock/api'
+import { useActiveSemester } from '@/hooks/useActiveSemester'
+import { useAllUsers } from '@/hooks/useAllUsers'
+import { getGroupMembersByGroup } from '@/lib/api'
+import { sendReminder } from '@/lib/api'
 import { cn } from '@/lib/utils'
 
 function safeFormat(value: string, pattern: string): string {
@@ -57,11 +59,14 @@ function rowStatusClass(status: RowStatus): string {
 }
 
 export function ModeratorDashboard() {
-  const roundsQuery = useRounds(1)
+  const activeSemesterQuery = useActiveSemester()
+  const semesterId = activeSemesterQuery.data?.semester_id ?? 0
+  const roundsQuery = useRounds(semesterId)
   const rounds = roundsQuery.data ?? []
 
   const [selectedRoundId, setSelectedRoundId] = useState<number>(1)
   const dashboardQuery = useModeratorDashboard(selectedRoundId)
+  const allUsersQuery = useAllUsers()
 
   const [page, setPage] = useState(1)
   const [expandedSlotIds, setExpandedSlotIds] = useState<number[]>([])
@@ -70,11 +75,7 @@ export function ModeratorDashboard() {
     () => rounds.find((r) => r.round_id === selectedRoundId) ?? null,
     [rounds, selectedRoundId],
   )
-  const semesterName = useMemo(() => {
-    if (!selectedRound) return 'Học kỳ'
-    const semester = mockSemesters.find((s) => s.semester_id === selectedRound.semester_id)
-    return semester?.semester_name ?? 'Học kỳ'
-  }, [selectedRound])
+  const semesterName = activeSemesterQuery.data?.semester_name ?? 'Học kỳ'
 
   const slotStats = dashboardQuery.data?.slotStats ?? []
   const reviewerStats = dashboardQuery.data?.reviewerStats ?? []
@@ -110,7 +111,8 @@ export function ModeratorDashboard() {
   }
 
   const sendGroupReminder = async (groupName: string, groupId: number, roundName: string) => {
-    const memberIds = mockGroupMembers.filter((m) => m.group_id === groupId).map((m) => m.student_id)
+    const members = await getGroupMembersByGroup(groupId)
+    const memberIds = members.map((m) => m.student_id)
     await Promise.all(
       memberIds.map((user_id) =>
         sendReminder(user_id, `Nhóm ${groupName} chưa đăng ký slot cho ${roundName}. Vui lòng xử lý sớm.`),
@@ -394,7 +396,7 @@ export function ModeratorDashboard() {
               const firstSlot = g.registeredSlots[0]
               const hasSlot = g.hasRegistered
               const gvhdName =
-                mockUsers.find((u) => u.user_id === g.group.gvhd_id)?.full_name ?? 'Chưa có GVHD'
+                (allUsersQuery.data ?? []).find((u) => u.user_id === g.group.gvhd_id)?.full_name ?? 'Chưa có GVHD'
               return (
                 <TableRow key={g.group.group_id} className={cn(!hasSlot ? 'bg-destructive/10' : '')}>
                   <TableCell className="font-medium">{g.group.group_name}</TableCell>

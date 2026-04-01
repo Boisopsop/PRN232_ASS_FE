@@ -2,6 +2,7 @@
  * Trang moderator quản lý vòng review (CRUD + publish/close).
  */
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueries } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -31,7 +32,8 @@ import {
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { useCreateRound, useDeleteRound, useRounds, useUpdateRound } from '@/hooks/useRounds'
-import { mockDb } from '@/lib/mock'
+import { useActiveSemester } from '@/hooks/useActiveSemester'
+import { getSlotsForRound } from '@/lib/api'
 import type { ReviewRound, RoundStatus } from '@/types'
 
 const roundSchema = z
@@ -85,7 +87,9 @@ const statusHeaderClass: Record<RoundStatus, string> = {
 }
 
 export function ManageRounds() {
-  const roundsQuery = useRounds(1)
+  const activeSemesterQuery = useActiveSemester()
+  const semesterId = activeSemesterQuery.data?.semester_id ?? 0
+  const roundsQuery = useRounds(semesterId)
   const rounds = roundsQuery.data ?? []
 
   const createRoundMutation = useCreateRound()
@@ -146,11 +150,23 @@ export function ManageRounds() {
     setModalOpen(true)
   }
 
-  const hasSlots = (round_id: number) => mockDb.slots.some((s) => s.round_id === round_id)
+  // Query slots for UPCOMING rounds to check if they can be deleted
+  const upcomingRoundIds = rounds.filter((r) => r.status === 'UPCOMING').map((r) => r.round_id)
+  const slotQueries = useQueries({
+    queries: upcomingRoundIds.map((roundId) => ({
+      queryKey: ['slots', roundId],
+      queryFn: () => getSlotsForRound(roundId),
+      staleTime: 30_000,
+    })),
+  })
+  const roundsWithSlots = new Set(
+    upcomingRoundIds.filter((_, i) => (slotQueries[i]?.data?.length ?? 0) > 0),
+  )
+  const hasSlots = (round_id: number) => roundsWithSlots.has(round_id)
 
   const submitForm = form.handleSubmit(async (values) => {
     const payload: Omit<ReviewRound, 'round_id'> = {
-      semester_id: 1,
+      semester_id: semesterId,
       round_number: values.round_number,
       round_name: values.round_name,
       registration_open_at: values.registration_open_at,

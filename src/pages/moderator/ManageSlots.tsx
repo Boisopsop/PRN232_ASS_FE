@@ -40,8 +40,9 @@ import {
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { useRounds } from '@/hooks/useRounds'
+import { useActiveSemester } from '@/hooks/useActiveSemester'
 import { useSlotsForRound } from '@/hooks/useSlots'
-import { createSlot, deleteSlot, updateSlot } from '@/lib/mock/api'
+import { createSlot, deleteSlot, updateSlot } from '@/lib/api'
 import type { Slot, SlotStatus } from '@/types'
 
 const slotSchema = z
@@ -115,7 +116,9 @@ function buildIso(date: string, hhmm: string): string {
 }
 
 export function ManageSlots() {
-  const roundsQuery = useRounds(1)
+  const activeSemesterQuery = useActiveSemester()
+  const semesterId = activeSemesterQuery.data?.semester_id ?? 0
+  const roundsQuery = useRounds(semesterId)
   const rounds = roundsQuery.data ?? []
   const [selectedRoundId, setSelectedRoundId] = React.useState(1)
   const slotsQuery = useSlotsForRound(selectedRoundId)

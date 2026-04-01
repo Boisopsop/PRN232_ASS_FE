@@ -4,8 +4,8 @@
 import { motion } from 'framer-motion'
 import { useMutation } from '@tanstack/react-query'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Eye, EyeOff, Loader2, ShieldCheck, User, Users, Wrench, CalendarCheck2, TriangleAlert, BarChart3 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { Eye, EyeOff, Loader2, CalendarCheck2, TriangleAlert, BarChart3 } from 'lucide-react'
+import { useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { z } from 'zod'
@@ -13,13 +13,16 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { loginApi } from '@/lib/mock/api'
+import { loginApi } from '@/lib/api'
 import { getRoleHomePath } from '@/router/getRoleHomePath'
 import { useAuthStore } from '@/stores/authStore'
 
 const loginSchema = z.object({
-  email: z.string().email('Email không hợp lệ'),
-  password: z.string().min(1, 'Vui lòng nhập mật khẩu'),
+  email: z.string({ required_error: 'Vui lòng nhập email' }).min(1, 'Vui lòng nhập email').refine(
+    (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
+    { message: 'Email không hợp lệ' },
+  ),
+  password: z.string({ required_error: 'Vui lòng nhập mật khẩu' }).min(1, 'Vui lòng nhập mật khẩu'),
 })
 
 type LoginFormValues = z.infer<typeof loginSchema>
@@ -29,7 +32,16 @@ export function LoginPage() {
   const { login } = useAuthStore()
   const [showPassword, setShowPassword] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
-  const [shakeKey, setShakeKey] = useState(0)
+  const formCardRef = useRef<HTMLDivElement>(null)
+
+  const triggerShake = () => {
+    const el = formCardRef.current
+    if (!el) return
+    el.classList.remove('animate-shake')
+    // force reflow
+    void el.offsetWidth
+    el.classList.add('animate-shake')
+  }
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -47,18 +59,18 @@ export function LoginPage() {
       navigate(getRoleHomePath(user.role), { replace: true })
     },
     onError: (error: unknown) => {
-      setShakeKey((prev) => prev + 1)
+      triggerShake()
       setFormError(error instanceof Error ? error.message : 'Đăng nhập thất bại')
     },
   })
 
   const submitHandler = form.handleSubmit(
-    async (values) => {
+    (values) => {
       setFormError(null)
-      await loginMutation.mutateAsync(values)
+      loginMutation.mutate(values)
     },
     () => {
-      setShakeKey((prev) => prev + 1)
+      triggerShake()
     },
   )
 
@@ -70,48 +82,6 @@ export function LoginPage() {
     ],
     [],
   )
-
-  const demoAccounts = useMemo(
-    () => [
-      {
-        roleName: 'Sinh viên',
-        email: 'an.sv@uni.edu',
-        password: '123456',
-        icon: User,
-        className: 'border-blue-600/30 bg-blue-600/10 text-blue-600 dark:text-blue-400',
-      },
-      {
-        roleName: 'GV Review',
-        email: 'dung.gvr@uni.edu',
-        password: '123456',
-        icon: Users,
-        className: 'border-green-600/30 bg-green-600/10 text-green-600 dark:text-green-400',
-      },
-      {
-        roleName: 'GVHD',
-        email: 'lan.gvhd@uni.edu',
-        password: '123456',
-        icon: Wrench,
-        className: 'border-purple-600/30 bg-purple-600/10 text-purple-600 dark:text-purple-400',
-      },
-      {
-        roleName: 'Moderator',
-        email: 'nam.mod@uni.edu',
-        password: '123456',
-        icon: ShieldCheck,
-        className: 'border-orange-600/30 bg-orange-600/10 text-orange-600 dark:text-orange-400',
-      },
-    ],
-    [],
-  )
-
-  const fillAndSubmitDemo = (email: string, password: string) => {
-    form.setValue('email', email, { shouldValidate: true, shouldDirty: true })
-    form.setValue('password', password, { shouldValidate: true, shouldDirty: true })
-    window.setTimeout(() => {
-      void submitHandler()
-    }, 200)
-  }
 
   return (
     <main className="flex min-h-screen bg-background">
@@ -164,21 +134,18 @@ export function LoginPage() {
       </motion.section>
 
       <section className="flex w-full items-center justify-center p-6 lg:w-[55%]">
-        <motion.div
-          key={shakeKey}
-          initial={{ x: 0 }}
-          animate={{ x: [0, -8, 8, -6, 6, 0] }}
-          transition={{ duration: 0.35 }}
+        <div
+          ref={formCardRef}
           className="w-full max-w-md rounded-2xl bg-card p-8 shadow-xl"
         >
           <h2 className="font-sora text-3xl font-bold text-foreground">Đăng nhập</h2>
 
-          <form onSubmit={submitHandler} className="mt-6 space-y-4">
+          <form onSubmit={submitHandler} noValidate className="mt-6 space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
-                type="email"
+                type="text"
                 placeholder="you@uni.edu"
                 {...form.register('email')}
               />
@@ -222,30 +189,7 @@ export function LoginPage() {
 
             {formError ? <p className="text-sm text-destructive">{formError}</p> : null}
           </form>
-
-          <div className="my-6 flex items-center gap-3">
-            <div className="h-px flex-1 bg-black/10" />
-            <span className="text-xs text-muted-foreground">hoặc dùng tài khoản demo</span>
-            <div className="h-px flex-1 bg-black/10" />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            {demoAccounts.map((item) => (
-              <button
-                key={item.email}
-                type="button"
-                onClick={() => fillAndSubmitDemo(item.email, item.password)}
-                className={`rounded-xl border p-3 text-left transition-all duration-200 hover:shadow-sm ${item.className}`}
-              >
-                <div className="flex items-center gap-2">
-                  <item.icon className="h-4 w-4" />
-                  <span className="text-sm font-semibold">{item.roleName}</span>
-                </div>
-                <div className="mt-1 truncate text-[11px] opacity-80">{item.email}</div>
-              </button>
-            ))}
-          </div>
-        </motion.div>
+        </div>
       </section>
     </main>
   )

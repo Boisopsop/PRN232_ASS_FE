@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom'
 
 import { useMarkAllAsRead, useNotifications, useUnreadCount } from '@/hooks/useNotifications'
 import { useOnClickOutside } from '@/hooks/useOnClickOutside'
-import { mockDb } from '@/lib/mock'
+import { markNotificationAsRead } from '@/lib/api'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { Badge } from '@/components/ui/badge'
@@ -66,10 +66,8 @@ export function NotificationDropdown({
     handler: () => onClose(),
   })
 
-  const onMarkOneRead = (notification_id: number) => {
-    mockDb.notifications = mockDb.notifications.map((n) =>
-      n.notification_id === notification_id ? { ...n, is_read: true } : n,
-    )
+  const onMarkOneRead = async (notification_id: number) => {
+    await markNotificationAsRead(notification_id)
     void qc.invalidateQueries({ queryKey: ['notifications', user_id] })
   }
 

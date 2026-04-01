@@ -19,6 +19,8 @@ import { ReviewerCalendar } from '@/pages/reviewer/ReviewerCalendar'
 import { ModeratorDashboard } from '@/pages/moderator/ModeratorDashboard'
 import { ManageRounds } from '@/pages/moderator/ManageRounds'
 import { ManageSlots } from '@/pages/moderator/ManageSlots'
+import { ManageSemesters } from '@/pages/moderator/ManageSemesters'
+import { ManageGroups } from '@/pages/moderator/ManageGroups'
 import { ReviewerConfig } from '@/pages/moderator/ReviewerConfig'
 import { NotificationsPage } from '@/pages/moderator/NotificationsPage'
 
@@ -115,6 +117,22 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute roleGroup="moderator">
             <NotificationsPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'moderator/semesters',
+        element: (
+          <ProtectedRoute roleGroup="moderator">
+            <ManageSemesters />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'moderator/groups',
+        element: (
+          <ProtectedRoute roleGroup="moderator">
+            <ManageGroups />
           </ProtectedRoute>
         ),
       },

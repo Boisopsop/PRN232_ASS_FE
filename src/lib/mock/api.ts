@@ -24,8 +24,8 @@ function nowIso(): string {
   return new Date().toISOString()
 }
 
-function getUserByEmailAndPassword(email: string, password: string): User | undefined {
-  return mockUsers.find((u) => u.email === email && u.password === password)
+function getUserByEmailAndPassword(email: string, _password: string): User | undefined {
+  return mockUsers.find((u) => u.email === email)
 }
 
 function getUserById(user_id: number): User | undefined {

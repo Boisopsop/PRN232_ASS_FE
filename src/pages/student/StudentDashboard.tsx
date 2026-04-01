@@ -22,8 +22,10 @@ import { RoundTimeline } from '@/components/shared/RoundTimeline'
 import { StatsCard } from '@/components/shared/StatsCard'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { useRounds } from '@/hooks/useRounds'
+import { useActiveSemester } from '@/hooks/useActiveSemester'
 import { useCancelGroupRegistration, useSlotsForRound } from '@/hooks/useSlots'
-import { mockDb, mockGroupMembers, mockGroups, mockUsers } from '@/lib/mock'
+import { useStudentGroup } from '@/hooks/useStudentGroup'
+import { useGroupRegistrations } from '@/hooks/useGroupRegistrations'
 import { useAuthStore } from '@/stores/authStore'
 import { useUiStore } from '@/stores/uiStore'
 
@@ -38,7 +40,9 @@ export function StudentDashboard() {
   const { currentUser } = useAuthStore()
   const { activeRoundId } = useUiStore()
 
-  const roundsQuery = useRounds(1)
+  const activeSemesterQuery = useActiveSemester()
+  const semesterId = activeSemesterQuery.data?.semester_id ?? 0
+  const roundsQuery = useRounds(semesterId)
   const rounds = roundsQuery.data ?? []
 
   const openRound = useMemo(() => rounds.find((r) => r.status === 'OPEN') ?? null, [rounds])
@@ -48,23 +52,12 @@ export function StudentDashboard() {
 
   const cancelMutation = useCancelGroupRegistration()
 
-  const group = useMemo(() => {
-    if (!currentUser) return null
-    const member = mockGroupMembers.find((m) => m.student_id === currentUser.user_id)
-    if (!member) return null
-    return mockGroups.find((g) => g.group_id === member.group_id) ?? null
-  }, [currentUser])
+  const studentGroupQuery = useStudentGroup(currentUser?.user_id ?? 0)
+  const group = studentGroupQuery.data?.group ?? null
+  const gvhdName = studentGroupQuery.data?.gvhd?.full_name ?? 'Chưa có GVHD'
 
-  const gvhdName = useMemo(() => {
-    if (!group) return 'Chưa có GVHD'
-    const gvhd = mockUsers.find((u) => u.user_id === group.gvhd_id)
-    return gvhd?.full_name ?? 'Chưa có GVHD'
-  }, [group])
-
-  const groupRegistrations = useMemo(() => {
-    if (!group) return []
-    return mockDb.groupRegistrations.filter((r) => r.group_id === group.group_id)
-  }, [group, cancelMutation.isSuccess])
+  const groupRegsQuery = useGroupRegistrations(group?.group_id ?? 0)
+  const groupRegistrations = groupRegsQuery.data ?? []
 
   const openRoundCount = useMemo(
     () => rounds.filter((r) => r.status === 'OPEN').length,
@@ -78,21 +71,22 @@ export function StudentDashboard() {
 
   const hasRegisteredInOpenRound = useMemo(() => {
     if (!group || !openRound) return false
-    return mockDb.groupRegistrations.some((r) => {
-      if (r.group_id !== group.group_id || r.status !== 'REGISTERED') return false
-      const slot = mockDb.slots.find((s) => s.slot_id === r.slot_id)
+    return groupRegistrations.some((r) => {
+      if (r.status !== 'REGISTERED') return false
+      const slot = slots.find((s) => s.slot_id === r.slot_id)
       return slot ? slot.round_id === openRound.round_id : false
     })
-  }, [group, openRound, cancelMutation.isSuccess])
+  }, [group, openRound, groupRegistrations, slots])
 
   const registrationRows = useMemo(() => {
     if (!group) return []
 
     return groupRegistrations
       .map((reg) => {
-        const slot = mockDb.slots.find((s) => s.slot_id === reg.slot_id)
+        // Find slot from the slots we already have loaded, or from all rounds
+        const slot = slots.find((s) => s.slot_id === reg.slot_id)
         if (!slot) return null
-        const round = mockDb.rounds.find((r) => r.round_id === slot.round_id)
+        const round = rounds.find((r) => r.round_id === slot.round_id)
         if (!round) return null
         const cancellable =
           reg.status === 'REGISTERED' &&
@@ -107,7 +101,7 @@ export function StudentDashboard() {
         }
       })
       .filter((row): row is NonNullable<typeof row> => Boolean(row))
-  }, [group, groupRegistrations, cancelMutation.isSuccess])
+  }, [group, groupRegistrations, slots, rounds])
 
   if (!currentUser) return null
 

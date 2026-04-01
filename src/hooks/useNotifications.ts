@@ -6,7 +6,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { Notification } from '@/types'
-import { getNotificationsForUser, markAllAsRead } from '@/lib/mock/api'
+import { getNotificationsForUser, markAllAsRead } from '@/lib/api'
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message

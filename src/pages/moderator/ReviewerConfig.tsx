@@ -23,8 +23,9 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useRounds } from '@/hooks/useRounds'
-import { getReviewerConfig, getSlotsForRound, updateReviewerConfig } from '@/lib/mock/api'
-import { mockUsers } from '@/lib/mock/users'
+import { useActiveSemester } from '@/hooks/useActiveSemester'
+import { useAllUsers } from '@/hooks/useAllUsers'
+import { getReviewerConfig, getSlotsForRound, updateReviewerConfig } from '@/lib/api'
 import { cn } from '@/lib/utils'
 
 const configSchema = z
@@ -50,9 +51,12 @@ function countReviewerRegistrationsForRound(slots: Awaited<ReturnType<typeof get
 
 export function ReviewerConfig() {
   const qc = useQueryClient()
-  const roundsQuery = useRounds(1)
+  const activeSemesterQuery = useActiveSemester()
+  const semesterId = activeSemesterQuery.data?.semester_id ?? 0
+  const roundsQuery = useRounds(semesterId)
   const rounds = roundsQuery.data ?? []
-  const reviewers = mockUsers.filter((u) => u.role === 'GV_REVIEW')
+  const allUsersQuery = useAllUsers('GV_REVIEW')
+  const reviewers = allUsersQuery.data ?? []
   const [editingRoundId, setEditingRoundId] = React.useState<number | null>(null)
   const [expandedRoundIds, setExpandedRoundIds] = React.useState<number[]>([])
 

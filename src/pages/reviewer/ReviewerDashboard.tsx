@@ -3,7 +3,6 @@
  */
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
 import { format, isValid, parseISO } from 'date-fns'
 import { Loader2 } from 'lucide-react'
 
@@ -20,8 +19,10 @@ import {
 } from '@/components/ui/table'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { useRounds } from '@/hooks/useRounds'
-import { useCancelReviewerRegistration } from '@/hooks/useReviewer'
-import { mockDb, mockGroups } from '@/lib/mock'
+import { useActiveSemester } from '@/hooks/useActiveSemester'
+import { useCancelReviewerRegistration, useReviewerStats } from '@/hooks/useReviewer'
+import { useReviewerRegistrations } from '@/hooks/useReviewerRegistrations'
+import { useSlotsForRound } from '@/hooks/useSlots'
 import { useAuthStore } from '@/stores/authStore'
 import { cn } from '@/lib/utils'
 
@@ -44,38 +45,43 @@ function getProgressClass(current: number, min: number): string {
 export function ReviewerDashboard() {
   const navigate = useNavigate()
   const { currentUser } = useAuthStore()
-  const roundsQuery = useRounds(1)
+  const activeSemesterQuery = useActiveSemester()
+  const semesterId = activeSemesterQuery.data?.semester_id ?? 0
+  const roundsQuery = useRounds(semesterId)
   const cancelMutation = useCancelReviewerRegistration()
 
-  const registrationsQuery = useQuery({
-    queryKey: ['reviewer-registrations', currentUser?.user_id],
-    queryFn: async () => {
-      if (!currentUser) return []
-      return mockDb.reviewerRegistrations.filter((r) => r.reviewer_id === currentUser.user_id)
-    },
-    enabled: Boolean(currentUser),
-  })
-
-  const configQuery = useQuery({
-    queryKey: ['reviewer-configs'],
-    queryFn: async () => mockDb.configs.slice(),
-  })
+  const reviewerRegsQuery = useReviewerRegistrations(currentUser?.user_id ?? 0)
 
   const rounds = roundsQuery.data ?? []
-  const registrations = registrationsQuery.data ?? []
-  const configs = configQuery.data ?? []
+  const registrations = reviewerRegsQuery.data ?? []
+
+  // Load slots for each round to build stats
+  const firstRoundId = rounds[0]?.round_id ?? 0
+  const secondRoundId = rounds[1]?.round_id ?? 0
+  const thirdRoundId = rounds[2]?.round_id ?? 0
+  const stats1 = useReviewerStats(currentUser?.user_id ?? 0, firstRoundId)
+  const stats2 = useReviewerStats(currentUser?.user_id ?? 0, secondRoundId)
+  const stats3 = useReviewerStats(currentUser?.user_id ?? 0, thirdRoundId)
+  const slotsQ1 = useSlotsForRound(firstRoundId)
+  const slotsQ2 = useSlotsForRound(secondRoundId)
+  const slotsQ3 = useSlotsForRound(thirdRoundId)
+
+  const allSlotsByRound = useMemo(() => {
+    const map = new Map<number, typeof slotsQ1.data>()
+    if (firstRoundId && slotsQ1.data) map.set(firstRoundId, slotsQ1.data)
+    if (secondRoundId && slotsQ2.data) map.set(secondRoundId, slotsQ2.data)
+    if (thirdRoundId && slotsQ3.data) map.set(thirdRoundId, slotsQ3.data)
+    return map
+  }, [firstRoundId, secondRoundId, thirdRoundId, slotsQ1.data, slotsQ2.data, slotsQ3.data])
+
+  const statsArr = [stats1, stats2, stats3]
 
   const statsByRound = useMemo(() => {
-    return rounds.map((round) => {
-      const config = configs.find((c) => c.round_id === round.round_id)
-      const minSlots = config?.min_slots ?? 0
-      const maxSlots = config?.max_slots ?? 0
-
-      const registeredCount = registrations.filter((reg) => {
-        if (reg.status !== 'REGISTERED') return false
-        const slot = mockDb.slots.find((s) => s.slot_id === reg.slot_id)
-        return slot ? slot.round_id === round.round_id : false
-      }).length
+    return rounds.map((round, idx) => {
+      const s = statsArr[idx]
+      const minSlots = s?.minRequired ?? 0
+      const maxSlots = s?.maxAllowed ?? 0
+      const registeredCount = s?.registeredCount ?? 0
 
       const missing = Math.max(0, minSlots - registeredCount)
       const statusLabel =
@@ -102,7 +108,10 @@ export function ReviewerDashboard() {
         statusClass,
       }
     })
-  }, [configs, registrations, rounds])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rounds, stats1.registeredCount, stats2.registeredCount, stats3.registeredCount,
+      stats1.minRequired, stats2.minRequired, stats3.minRequired,
+      stats1.maxAllowed, stats2.maxAllowed, stats3.maxAllowed])
 
   const warnings = useMemo(() => {
     return statsByRound.filter((s) => s.round.status === 'OPEN' && s.registeredCount < s.minSlots)
@@ -110,15 +119,13 @@ export function ReviewerDashboard() {
 
   const groupedRegistrations = useMemo(() => {
     return rounds.map((round) => {
+      const roundSlots = allSlotsByRound.get(round.round_id) ?? []
       const rows = registrations
         .filter((reg) => reg.status === 'REGISTERED')
         .map((reg) => {
-          const slot = mockDb.slots.find((s) => s.slot_id === reg.slot_id)
-          if (!slot || slot.round_id !== round.round_id) return null
-          const groupNames = mockDb.groupRegistrations
-            .filter((gr) => gr.slot_id === slot.slot_id && gr.status === 'REGISTERED')
-            .map((gr) => mockGroups.find((g) => g.group_id === gr.group_id)?.group_name)
-            .filter((name): name is string => Boolean(name))
+          const slot = roundSlots.find((s) => s.slot_id === reg.slot_id)
+          if (!slot) return null
+          const groupNames = slot.registered_groups.map((g) => g.group_name)
           return {
             reg,
             slot,
@@ -129,7 +136,7 @@ export function ReviewerDashboard() {
 
       return { round, rows }
     })
-  }, [registrations, rounds, cancelMutation.isSuccess])
+  }, [registrations, rounds, allSlotsByRound, cancelMutation.isSuccess])
 
   if (!currentUser) return null
 

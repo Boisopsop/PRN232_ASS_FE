@@ -16,8 +16,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { useMarkAllAsRead, useNotifications } from '@/hooks/useNotifications'
-import { sendReminder } from '@/lib/mock/api'
-import { mockUsers } from '@/lib/mock/users'
+import { useAllUsers } from '@/hooks/useAllUsers'
+import { sendReminder } from '@/lib/api'
 import { useAuthStore } from '@/stores/authStore'
 import { cn } from '@/lib/utils'
 import type { Notification } from '@/types'
@@ -52,6 +52,8 @@ export function NotificationsPage() {
   const userId = currentUser?.user_id ?? 0
   const notificationsQuery = useNotifications(userId)
   const markAllMutation = useMarkAllAsRead()
+  const allUsersQuery = useAllUsers()
+  const allUsers = allUsersQuery.data ?? []
 
   const [tab, setTab] = React.useState<FilterTab>('ALL')
   const [localNotifications, setLocalNotifications] = React.useState<Notification[]>([])
@@ -91,7 +93,7 @@ export function NotificationsPage() {
     return n.type === tab
   })
 
-  const specificCandidates = mockUsers.filter((u) => u.role !== 'MODERATOR')
+  const specificCandidates = allUsers.filter((u) => u.role !== 'MODERATOR')
 
   const markOneAsRead = (notificationId: number) => {
     setLocalNotifications((prev) =>
@@ -114,9 +116,9 @@ export function NotificationsPage() {
 
     let recipientIds: number[] = []
     if (recipientMode === 'ALL_STUDENT') {
-      recipientIds = mockUsers.filter((u) => u.role === 'STUDENT').map((u) => u.user_id)
+      recipientIds = allUsers.filter((u) => u.role === 'STUDENT').map((u) => u.user_id)
     } else if (recipientMode === 'ALL_REVIEWER') {
-      recipientIds = mockUsers.filter((u) => u.role === 'GV_REVIEW').map((u) => u.user_id)
+      recipientIds = allUsers.filter((u) => u.role === 'GV_REVIEW').map((u) => u.user_id)
     } else if (specificUserId) {
       recipientIds = [specificUserId]
     }

@@ -58,7 +58,9 @@ import {
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { useRounds } from '@/hooks/useRounds'
 import { useSlotsForRound, useRegisterGroupSlot, useCancelGroupRegistration } from '@/hooks/useSlots'
-import { mockDb, mockGroupMembers, mockGroups, mockSemesters } from '@/lib/mock'
+import { useStudentGroup } from '@/hooks/useStudentGroup'
+import { useGroupRegistrations } from '@/hooks/useGroupRegistrations'
+import { useActiveSemester } from '@/hooks/useActiveSemester'
 import { useAuthStore } from '@/stores/authStore'
 import { cn } from '@/lib/utils'
 import type { ReviewRound, SlotWithDetails } from '@/types'
@@ -88,11 +90,13 @@ const WEEKDAY_LABELS = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
 
 export function StudentCalendar() {
   const { currentUser } = useAuthStore()
-  const roundsQuery = useRounds(1)
-  const rounds = roundsQuery.data ?? []
 
   // find active semester
-  const activeSemester = useMemo(() => mockSemesters.find((s) => s.is_active) ?? null, [])
+  const activeSemesterQuery = useActiveSemester()
+  const activeSemester = activeSemesterQuery.data ?? null
+
+  const roundsQuery = useRounds(activeSemester?.semester_id ?? 0)
+  const rounds = roundsQuery.data ?? []
 
   // Round selection
   const firstOpenRoundId = useMemo(
@@ -122,25 +126,22 @@ export function StudentCalendar() {
   const cancelMutation = useCancelGroupRegistration()
 
   // Group of current student
-  const group = useMemo(() => {
-    if (!currentUser) return null
-    const member = mockGroupMembers.find((m) => m.student_id === currentUser.user_id)
-    if (!member) return null
-    return mockGroups.find((g) => g.group_id === member.group_id) ?? null
-  }, [currentUser])
+  const studentGroupQuery = useStudentGroup(currentUser?.user_id ?? 0)
+  const group = studentGroupQuery.data?.group ?? null
 
   // Existing registration for this round
+  const groupRegsQuery = useGroupRegistrations(group?.group_id ?? 0)
   const groupRegistration = useMemo(() => {
     if (!group || !activeRound) return null
+    const regs = groupRegsQuery.data ?? []
     return (
-      mockDb.groupRegistrations.find((r) => {
-        if (r.group_id !== group.group_id || r.status !== 'REGISTERED') return false
-        const slot = mockDb.slots.find((s) => s.slot_id === r.slot_id)
+      regs.find((r) => {
+        if (r.status !== 'REGISTERED') return false
+        const slot = slots.find((s) => s.slot_id === r.slot_id)
         return slot ? slot.round_id === activeRound.round_id : false
       }) ?? null
     )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [group, activeRound, registerMutation.isSuccess, cancelMutation.isSuccess])
+  }, [group, activeRound, groupRegsQuery.data, slots])
 
   // Calendar month state
   const [monthBase, setMonthBase] = useState<Date>(() => {
@@ -343,7 +344,7 @@ export function StudentCalendar() {
                 ✅ Nhóm bạn đã đăng ký slot cho {activeRound?.round_name}
               </div>
               {(() => {
-                const slot = mockDb.slots.find(
+                const slot = slots.find(
                   (s) => s.slot_id === groupRegistration.slot_id,
                 )
                 if (!slot) return null

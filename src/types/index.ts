@@ -8,7 +8,6 @@ export interface User {
   user_id: number
   full_name: string
   email: string
-  password: string
   role: UserRole
   avatar_url?: string
   created_at: string

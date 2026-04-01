@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { GroupSlotRegistration } from '@/types'
-import { cancelGroupRegistration, getSlotsForRound, registerGroupSlot } from '@/lib/mock/api'
+import { cancelGroupRegistration, getSlotsForRound, registerGroupSlot } from '@/lib/api'
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message
@@ -16,6 +16,7 @@ export function useSlotsForRound(round_id: number) {
   return useQuery({
     queryKey: ['slots', round_id],
     queryFn: () => getSlotsForRound(round_id),
+    enabled: round_id > 0,
   })
 }
 

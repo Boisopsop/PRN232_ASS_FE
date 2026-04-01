@@ -3,7 +3,7 @@
  */
 import { useQuery } from '@tanstack/react-query'
 
-import { getModeratorDashboardData } from '@/lib/mock/api'
+import { getModeratorDashboardData } from '@/lib/api'
 
 export function useModeratorDashboard(round_id: number) {
   return useQuery({
