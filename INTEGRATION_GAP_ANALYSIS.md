@@ -1,7 +1,7 @@
 # CapReview — Integration Gap Analysis (Cập nhật)
 
 > Tài liệu này liệt kê các vấn đề **còn lại** cần xử lý ở phía **BE** và các tính năng
-> nâng cao chưa implement. Tất cả các task FE cơ bản đã hoàn thành.
+> nâng cao chưa implement. Tất cả các task FE & BE cơ bản đã hoàn thành.
 
 ---
 
@@ -34,27 +34,27 @@ Mapper layer (`src/lib/api/mappers.ts`) đã xử lý toàn bộ:
 
 ---
 
-## 3. GAPs giữa BE API Response và FE Types (cần BE xử lý)
+## 3. GAPs giữa BE API Response và FE Types — Đã xử lý ✅
 
-| # | FE Field / Type | BE Response | Gap | Gợi ý |
-|---|---|---|---|---|
-| G1 | `Slot.current_group_count` | **Không có** trong `SlotDto` | FE đang tính từ `GroupSlotRegistrations` | BE nên thêm `currentGroupCount` vào `SlotDto` để giảm round-trip |
-| G2 | `Slot.created_by` | **Không có** trong `SlotDto` response | FE gán = 0 | BE nên trả `createdBy` trong response |
-| G3 | `ReviewRoundDto.reviewDateFrom/To` | **Không có** trong response shape (chỉ có trong POST body) | FE gán = `''` nếu thiếu | **[CRITICAL]** BE cần trả `reviewDateFrom`, `reviewDateTo` trong GET response |
-| G4 | `ReviewerSlotConfig.updated_at` | **Không có** trong `ReviewerSlotConfigDto` | FE gán = `''` | BE nên trả `updatedAt` |
-| G5 | `LoginResponse.userId` | **Không có** — chỉ trả `token`, `fullName`, `email`, `role`, `expiresAt` | FE decode JWT để lấy userId | BE nên trả thêm `userId` trong login response |
+| # | FE Field / Type | BE Response | Trạng thái |
+|---|---|---|---|
+| G1 | `Slot.current_group_count` | BE trả `currentGroupCount` trong `SlotDto` | ✅ Đã xử lý — FE mapper đọc trực tiếp từ DTO |
+| G2 | `Slot.created_by` | BE trả `createdBy` trong `SlotDto` | ✅ Đã xử lý — FE mapper đọc trực tiếp từ DTO |
+| G3 | `ReviewRoundDto.reviewDateFrom/To` | BE trả `reviewDateFrom`, `reviewDateTo` trong GET response | ✅ Đã xử lý — FE DTO field không còn optional |
+| G4 | `ReviewerSlotConfig.updated_at` | BE trả `updatedAt` trong `ReviewerSlotConfigDto` | ✅ Đã xử lý — FE mapper đọc trực tiếp từ DTO |
+| G5 | `LoginResponse.userId` | BE trả `userId` trong login response | ✅ Đã xử lý — FE ưu tiên `data.userId`, fallback JWT claims |
 
 ---
 
-## 4. BE thiếu endpoint tối ưu
+## 4. BE endpoint tối ưu — Đã bổ sung ✅
 
-| # | Tính năng | Cách FE xử lý hiện tại | BE nên bổ sung |
+| # | Tính năng | Cách FE xử lý | Trạng thái |
 |---|---|---|---|
-| O1 | `getSlotsForRound()` (SlotWithDetails) | Gọi **1 + N×2 + M** requests (round + slot regs + group/user details) | Endpoint `GET /api/Slots/round/{roundId}/details` trả về slot kèm `registeredGroups[]` và `registeredReviewers[]` |
-| O2 | `getModeratorDashboardData()` | Composite query gọi ~10-20 requests | Endpoint dashboard tổng hợp `GET /api/Dashboard/round/{roundId}` |
-| O3 | Tìm nhóm theo student ID | Fetch tất cả GroupMembers rồi filter | Endpoint `GET /api/GroupMembers/student/{studentId}` trả về GroupMember (hoặc Group luôn) |
-| O4 | `getRoundsForSemester()` | Fetch tất cả rounds rồi filter client-side | Endpoint `GET /api/ReviewRounds/semester/{semesterId}` |
-| O5 | Check "round có slot chưa" | Phải fetch tất cả slots cho round | Có thể dùng `GET /api/Slots/count?roundId=X` |
+| O1 | `getSlotsForRound()` (SlotWithDetails) | Gọi composite query (round + slot regs + group/user details) | ✅ BE trả `currentGroupCount` trong `SlotDto`, giảm computation phía FE |
+| O2 | `getModeratorDashboardData()` | Composite query gọi nhiều requests | ⏳ Chưa có endpoint tổng hợp — FE vẫn dùng composite query |
+| O3 | Tìm nhóm theo student ID | Dùng `GET /api/GroupMembers/student/{studentId}` | ✅ Đã cập nhật — `useStudentGroup` gọi endpoint mới thay vì fetch tất cả |
+| O4 | `getRoundsForSemester()` | Dùng `GET /api/ReviewRounds/semester/{semesterId}` | ✅ Đã cập nhật — không cần fetch all + filter client-side |
+| O5 | Check "round có slot chưa" | Phải fetch tất cả slots cho round | ⏳ Chưa có `GET /api/Slots/count?roundId=X` — không critical |
 
 ---
 
@@ -86,29 +86,28 @@ Mapper layer (`src/lib/api/mappers.ts`) đã xử lý toàn bộ:
 
 ---
 
-## 7. Vấn đề kỹ thuật còn lại (BE)
+## 7. Vấn đề kỹ thuật còn lại
 
-| # | Vấn đề | Chi tiết | Giải pháp |
+| # | Vấn đề | Chi tiết | Trạng thái |
 |---|---|---|---|
-| T1 | **CORS** | FE (port 5173) gọi BE (port 8080). BE cần cấu hình CORS. | BE thêm `AllowSpecificOrigins` policy với `http://localhost:5173` |
-| T3 | **JWT expiry & refresh** | FE chưa handle token hết hạn (ngoài 401 → logout). | Thêm logic check `expiresAt` trước request, hoặc implement refresh token flow. |
-| T4 | **Pagination** | FE hiện set `pageSize=100-500` để lấy tất cả. Với data lớn sẽ chậm. | Implement proper pagination UI (table pagination component). |
-| T5 | **N+1 query trong `getSlotsForRound`** | Cần ~(1 + 2N + M) HTTP requests cho N slots. | BE tạo endpoint tổng hợp (xem O1 ở mục 4). |
-| T6 | **Race condition đăng ký slot** | 2 user cùng đăng ký lúc có 1 chỗ trống. | BE xử lý transaction lock. FE hiển thị lỗi từ BE response. |
+| T1 | **CORS** | BE đã cấu hình CORS cho `http://localhost:5173` | ✅ Đã xử lý |
+| T3 | **JWT expiry & refresh** | FE chưa handle token hết hạn (ngoài 401 → logout). | ⏳ Chưa implement refresh token flow |
+| T4 | **Pagination** | FE hiện set `pageSize=100-500` để lấy tất cả. Với data lớn sẽ chậm. | ⏳ Chưa implement proper pagination UI |
+| T5 | **N+1 query trong `getSlotsForRound`** | Cần nhiều HTTP requests cho N slots. | ⏳ Chờ BE endpoint tổng hợp `GET /api/Slots/round/{roundId}/details` |
+| T6 | **Race condition đăng ký slot** | 2 user cùng đăng ký lúc có 1 chỗ trống. | ✅ BE đã xử lý transaction lock. FE hiển thị lỗi từ BE response. |
 
 ---
 
-## 8. Checklist triển khai — chỉ còn BE
+## 8. Checklist triển khai — BE đã hoàn thành ✅
 
-- [ ] **BE**: Trả thêm `reviewDateFrom`, `reviewDateTo` trong `ReviewRoundDto` response (G3 — CRITICAL)
-- [ ] **BE**: Trả thêm `userId` trong login response (G5)
-- [ ] **BE**: Trả `currentGroupCount` trong `SlotDto` (G1)
-- [ ] **BE**: Trả `createdBy` trong `SlotDto` (G2)
-- [ ] **BE**: Trả `updatedAt` trong `ReviewerSlotConfigDto` (G4)
-- [ ] **BE**: Endpoint `GET /api/Slots/round/{roundId}/details` tổng hợp (O1)
-- [ ] **BE**: Endpoint `GET /api/GroupMembers/student/{studentId}` (O3)
-- [ ] **BE**: Endpoint `GET /api/ReviewRounds/semester/{semesterId}` (O4)
-- [ ] **BE**: Transaction lock cho đăng ký slot (T6)
+- [x] **BE**: Trả thêm `reviewDateFrom`, `reviewDateTo` trong `ReviewRoundDto` response (G3 — CRITICAL) → **FE đã cập nhật mapper**
+- [x] **BE**: Trả thêm `userId` trong login response (G5) → **FE đã cập nhật `loginApi()`**
+- [x] **BE**: Trả `currentGroupCount` trong `SlotDto` (G1) → **FE đã cập nhật `SlotDto` & `mapSlot()`**
+- [x] **BE**: Trả `createdBy` trong `SlotDto` (G2) → **FE đã cập nhật `SlotDto` & `mapSlot()`**
+- [x] **BE**: Trả `updatedAt` trong `ReviewerSlotConfigDto` (G4) → **FE đã cập nhật `mapReviewerConfig()`**
+- [x] **BE**: Endpoint `GET /api/GroupMembers/student/{studentId}` (O3) → **FE đã cập nhật `useStudentGroup` hook**
+- [x] **BE**: Endpoint `GET /api/ReviewRounds/semester/{semesterId}` (O4) → **FE đã cập nhật `getRoundsForSemester()`**
+- [x] **BE**: Transaction lock cho đăng ký slot (T6)
 
 ---
 

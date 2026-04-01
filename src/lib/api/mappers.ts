@@ -90,6 +90,7 @@ export const feToBeNotifType: Record<NotificationType, string> = {
 
 export interface LoginResponseDto {
   token: string
+  userId: number
   fullName: string
   email: string
   role: string
@@ -121,8 +122,8 @@ export interface ReviewRoundDto {
   roundName: string
   registrationOpenAt: string
   registrationCloseAt: string
-  reviewDateFrom?: string
-  reviewDateTo?: string
+  reviewDateFrom: string
+  reviewDateTo: string
   status: string
 }
 
@@ -133,9 +134,11 @@ export interface SlotDto {
   endTime: string
   room: string
   maxGroups: number
+  currentGroupCount: number
   minReviewers: number
   maxReviewers: number
   status: string
+  createdBy: number
 }
 
 export interface GroupDto {
@@ -178,6 +181,7 @@ export interface ReviewerSlotConfigDto {
   minSlots: number
   maxSlots: number
   updatedBy: number
+  updatedAt: string
 }
 
 export interface NotificationDto {
@@ -222,8 +226,8 @@ export function mapRound(dto: ReviewRoundDto): ReviewRound {
     round_name: dto.roundName,
     registration_open_at: dto.registrationOpenAt,
     registration_close_at: dto.registrationCloseAt,
-    review_date_from: dto.reviewDateFrom ?? '',
-    review_date_to: dto.reviewDateTo ?? '',
+    review_date_from: dto.reviewDateFrom,
+    review_date_to: dto.reviewDateTo,
     status: beToFeRoundStatus[dto.status] ?? 'UPCOMING',
   }
 }
@@ -236,11 +240,11 @@ export function mapSlot(dto: SlotDto): Slot {
     end_time: dto.endTime,
     room: dto.room,
     max_groups: dto.maxGroups,
-    current_group_count: 0, // BE không trả field này — tính từ registrations
+    current_group_count: dto.currentGroupCount,
     min_reviewers: dto.minReviewers,
     max_reviewers: dto.maxReviewers,
     status: beToFeSlotStatus[dto.status] ?? 'OPEN',
-    created_by: 0, // BE không trả field này trong response shape
+    created_by: dto.createdBy,
   }
 }
 
@@ -293,7 +297,7 @@ export function mapReviewerConfig(dto: ReviewerSlotConfigDto): ReviewerSlotConfi
     min_slots: dto.minSlots,
     max_slots: dto.maxSlots,
     updated_by: dto.updatedBy,
-    updated_at: '', // BE không trả field này
+    updated_at: dto.updatedAt,
   }
 }
 

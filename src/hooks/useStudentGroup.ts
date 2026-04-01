@@ -3,15 +3,14 @@
  */
 import { useQuery } from '@tanstack/react-query'
 
-import { getGroupMembers, getGroupById, getUserById } from '@/lib/api'
+import { getGroupMemberByStudent, getGroupById, getUserById } from '@/lib/api'
 import type { Group, User } from '@/types'
 
 export function useStudentGroup(userId: number) {
   return useQuery({
     queryKey: ['student-group', userId],
     queryFn: async (): Promise<{ group: Group; gvhd: User | null } | null> => {
-      const allMembers = await getGroupMembers(500)
-      const membership = allMembers.find((m) => m.student_id === userId)
+      const membership = await getGroupMemberByStudent(userId)
       if (!membership) return null
       const group = await getGroupById(membership.group_id)
       let gvhd: User | null = null

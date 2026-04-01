@@ -80,8 +80,9 @@ export async function loginApi(email: string, password: string): Promise<User> {
   // Lấy claims từ JWT để fallback khi response body thiếu trường
   const claims = parseJwtPayload(data.token)
 
-  // UserId: thử nhiều claim name (.NET dùng cả short & long URI)
+  // UserId: ưu tiên response body, fallback JWT claims
   const rawId =
+    data.userId ??
     claims.nameid ??
     claims.sub ??
     claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'] ??
@@ -197,10 +198,10 @@ export async function deleteSemester(semester_id: number): Promise<void> {
 // ====================================================================
 
 export async function getRoundsForSemester(semester_id: number): Promise<ReviewRound[]> {
-  const { data } = await apiClient.get<ReviewRoundDto[]>('/ReviewRounds', {
-    params: { pageSize: 100 },
-  })
-  return data.map(mapRound).filter((r) => r.semester_id === semester_id)
+  const { data } = await apiClient.get<ReviewRoundDto[]>(
+    `/ReviewRounds/semester/${semester_id}`,
+  )
+  return data.map(mapRound)
 }
 
 export async function getOpenRounds(): Promise<ReviewRound[]> {
@@ -616,6 +617,19 @@ export async function addGroupMember(
     studentId,
   })
   return mapGroupMember(data)
+}
+
+export async function getGroupMemberByStudent(
+  studentId: number,
+): Promise<GroupMember | null> {
+  try {
+    const { data } = await apiClient.get<GroupMemberDto>(
+      `/GroupMembers/student/${studentId}`,
+    )
+    return mapGroupMember(data)
+  } catch {
+    return null
+  }
 }
 
 export async function removeGroupMember(memberId: number): Promise<void> {
