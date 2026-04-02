@@ -26,6 +26,7 @@ export function useRegisterReviewerSlot() {
       registerReviewerSlot(vars.reviewer_id, vars.slot_id),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['slots'] })
+      void qc.invalidateQueries({ queryKey: ['reviewer-registrations'] })
       toast.success('Đăng ký reviewer thành công')
     },
     onError: (error: unknown) => {
@@ -42,6 +43,7 @@ export function useCancelReviewerRegistration() {
       cancelReviewerRegistration(vars.reviewer_registration_id),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ['slots'] })
+      void qc.invalidateQueries({ queryKey: ['reviewer-registrations'] })
       toast.success('Đã hủy đăng ký reviewer thành công')
     },
     onError: (error: unknown) => {

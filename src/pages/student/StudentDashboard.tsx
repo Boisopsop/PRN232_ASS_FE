@@ -24,6 +24,7 @@ import { StatusBadge } from '@/components/shared/StatusBadge'
 import { useRounds } from '@/hooks/useRounds'
 import { useActiveSemester } from '@/hooks/useActiveSemester'
 import { useCancelGroupRegistration, useSlotsForRound } from '@/hooks/useSlots'
+import { useSlotSignalR } from '@/hooks/useSlotSignalR'
 import { useStudentGroup } from '@/hooks/useStudentGroup'
 import { useGroupRegistrations } from '@/hooks/useGroupRegistrations'
 import { useAuthStore } from '@/stores/authStore'
@@ -48,6 +49,7 @@ export function StudentDashboard() {
   const openRound = useMemo(() => rounds.find((r) => r.status === 'OPEN') ?? null, [rounds])
   const effectiveRoundId = openRound?.round_id ?? activeRoundId
   const slotsQuery = useSlotsForRound(effectiveRoundId)
+  useSlotSignalR(effectiveRoundId)
   const slots = slotsQuery.data ?? []
 
   const cancelMutation = useCancelGroupRegistration()

@@ -23,6 +23,7 @@ import { useActiveSemester } from '@/hooks/useActiveSemester'
 import { useCancelReviewerRegistration, useReviewerStats } from '@/hooks/useReviewer'
 import { useReviewerRegistrations } from '@/hooks/useReviewerRegistrations'
 import { useSlotsForRound } from '@/hooks/useSlots'
+import { useSlotSignalR } from '@/hooks/useSlotSignalR'
 import { useAuthStore } from '@/stores/authStore'
 import { cn } from '@/lib/utils'
 
@@ -65,6 +66,9 @@ export function ReviewerDashboard() {
   const slotsQ1 = useSlotsForRound(firstRoundId)
   const slotsQ2 = useSlotsForRound(secondRoundId)
   const slotsQ3 = useSlotsForRound(thirdRoundId)
+  useSlotSignalR(firstRoundId)
+  useSlotSignalR(secondRoundId)
+  useSlotSignalR(thirdRoundId)
 
   const allSlotsByRound = useMemo(() => {
     const map = new Map<number, typeof slotsQ1.data>()

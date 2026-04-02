@@ -28,7 +28,10 @@ export function getNavLinks(role: UserRole): NavLinkItem[] {
   }
 
   if (role === 'GVHD') {
-    return [{ to: '/reviewer/dashboard', label: 'Tổng quan', Icon: LayoutDashboard }]
+    return [
+      { to: '/reviewer/dashboard', label: 'Tổng quan', Icon: LayoutDashboard },
+      { to: '/reviewer/calendar', label: 'Lịch đăng ký', Icon: Calendar },
+    ]
   }
 
   return [

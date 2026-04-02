@@ -42,6 +42,7 @@ import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { useRounds } from '@/hooks/useRounds'
 import { useActiveSemester } from '@/hooks/useActiveSemester'
 import { useSlotsForRound } from '@/hooks/useSlots'
+import { useSlotSignalR } from '@/hooks/useSlotSignalR'
 import { createSlot, deleteSlot, updateSlot } from '@/lib/api'
 import type { Slot, SlotStatus } from '@/types'
 
@@ -122,6 +123,7 @@ export function ManageSlots() {
   const rounds = roundsQuery.data ?? []
   const [selectedRoundId, setSelectedRoundId] = React.useState(1)
   const slotsQuery = useSlotsForRound(selectedRoundId)
+  useSlotSignalR(selectedRoundId)
   const slots = slotsQuery.data ?? []
 
   const [slotModalOpen, setSlotModalOpen] = React.useState(false)

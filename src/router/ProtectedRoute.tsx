@@ -20,10 +20,7 @@ function isAllowedForRoleGroup(role: UserRole, roleGroup: RoleGroup, pathname: s
   if (roleGroup === 'moderator') return role === 'MODERATOR'
 
   // reviewer
-  if (pathname === '/reviewer/dashboard') {
-    return role === 'GV_REVIEW' || role === 'GVHD'
-  }
-  return role === 'GV_REVIEW'
+  return role === 'GV_REVIEW' || role === 'GVHD'
 }
 
 export function ProtectedRoute({ roleGroup, children }: ProtectedRouteProps) {

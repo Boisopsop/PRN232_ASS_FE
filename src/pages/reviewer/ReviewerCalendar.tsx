@@ -51,6 +51,7 @@ import { SlotCard } from '@/components/shared/SlotCard'
 import { SlotCardSkeleton } from '@/components/shared/LoadingSkeletons'
 import { useRounds } from '@/hooks/useRounds'
 import { useSlotsForRound } from '@/hooks/useSlots'
+import { useSlotSignalR } from '@/hooks/useSlotSignalR'
 import { useRegisterReviewerSlot, useCancelReviewerRegistration, useReviewerStats } from '@/hooks/useReviewer'
 import { useReviewerRegistrations } from '@/hooks/useReviewerRegistrations'
 import { useActiveSemester } from '@/hooks/useActiveSemester'
@@ -113,6 +114,7 @@ export function ReviewerCalendar() {
 
   // Slots
   const slotsQuery = useSlotsForRound(selectedRoundId)
+  useSlotSignalR(selectedRoundId)
   const slots = slotsQuery.data ?? []
   const registerMutation = useRegisterReviewerSlot()
   const cancelMutation = useCancelReviewerRegistration()

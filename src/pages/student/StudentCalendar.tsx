@@ -58,6 +58,7 @@ import {
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { useRounds } from '@/hooks/useRounds'
 import { useSlotsForRound, useRegisterGroupSlot, useCancelGroupRegistration } from '@/hooks/useSlots'
+import { useSlotSignalR } from '@/hooks/useSlotSignalR'
 import { useStudentGroup } from '@/hooks/useStudentGroup'
 import { useGroupRegistrations } from '@/hooks/useGroupRegistrations'
 import { useActiveSemester } from '@/hooks/useActiveSemester'
@@ -121,6 +122,7 @@ export function StudentCalendar() {
 
   // Slots
   const slotsQuery = useSlotsForRound(selectedRoundId)
+  useSlotSignalR(selectedRoundId)
   const slots = slotsQuery.data ?? []
   const registerMutation = useRegisterGroupSlot()
   const cancelMutation = useCancelGroupRegistration()
@@ -823,6 +825,7 @@ export function SlotBookingPage() {
   )
 
   const slotsQuery = useSlotsForRound(selectedRoundId)
+  useSlotSignalR(selectedRoundId)
   const slots = slotsQuery.data ?? []
 
   const studentGroupQuery = useStudentGroup(currentUser?.user_id ?? 0)
